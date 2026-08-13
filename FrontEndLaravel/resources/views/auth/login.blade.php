@@ -47,7 +47,7 @@ class="min-h-screen bg-gradient-to-br from-lime-50 via-white to-green-100">
 </div>
 
 <h1 class="text-6xl font-black text-lime-600">
-WISE
+Karsa Nirmala
 </h1>
 
 <h2 class="text-4xl font-black mt-8 text-slate-800">

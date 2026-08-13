@@ -12,29 +12,7 @@
                aria-label="WISE Home">
 
                 <div class="relative w-12 h-12 shrink-0">
-                    <div class="absolute inset-0 rounded-2xl bg-lime-400 opacity-20 blur-md transition duration-300 group-hover:opacity-40"></div>
-
-                    <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-lime-400 to-green-600 flex items-center justify-center shadow-lg shadow-lime-500/20 transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-lime-500/30">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="1.9"
-                             stroke-linecap="round"
-                             stroke-linejoin="round"
-                             class="w-6 h-6 text-white">
-                            <path d="M12 3v3"></path>
-                            <path d="M18.4 5.6l-2.1 2.1"></path>
-                            <path d="M21 12h-3"></path>
-                            <path d="M18.4 18.4l-2.1-2.1"></path>
-                            <path d="M12 21v-3"></path>
-                            <path d="M5.6 18.4l2.1-2.1"></path>
-                            <path d="M3 12h3"></path>
-                            <path d="M5.6 5.6l2.1 2.1"></path>
-                            <circle cx="12" cy="12" r="4"></circle>
-                            <path d="M12 8.2c-1.6 1-2.4 2.2-2.4 3.6 0 1.5 1.1 2.7 2.4 2.7s2.4-1.2 2.4-2.7c0-1.4-.8-2.6-2.4-3.6Z"></path>
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/karsa-nirmala-logo.svg') }}" alt="Karsa Nirmala logo" class="h-12 w-12 object-contain drop-shadow-sm">
                 </div>
 
                 <div class="leading-tight">

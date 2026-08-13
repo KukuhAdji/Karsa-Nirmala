@@ -13,7 +13,7 @@
     <div>
 
         <h1 class="text-4xl font-black">
-            WISE Waste Scanner
+            Karsa Nirmala Waste Scanner
         </h1>
 
         <p class="text-slate-500 mt-2">
