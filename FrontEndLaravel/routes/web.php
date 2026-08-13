@@ -8,6 +8,8 @@ use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BankSampahController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +20,7 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +41,7 @@ Route::middleware('guest')->group(function () {
 
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
@@ -49,8 +53,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scanner
+    |--------------------------------------------------------------------------
+    */
 
     Route::post('/scanner/upload', [ScannerController::class, 'store'])
         ->name('scanner.upload');
@@ -61,14 +79,39 @@ Route::middleware('auth')->group(function () {
     Route::get('/scanner/history', [ScannerController::class, 'history'])
         ->name('scanner.history');
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Education
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/education', [EducationController::class, 'index'])
         ->name('education');
 
     Route::get('/education/{slug}', [EducationController::class, 'show'])
         ->name('education.show');
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chatbot
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/chatbot', [ChatbotController::class, 'index'])
         ->name('chatbot');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Bank Sampah
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/bank-sampah', [BankSampahController::class, 'index'])
+        ->name('bank-sampah');
+
 
     /*
     |--------------------------------------------------------------------------
@@ -78,6 +121,13 @@ Route::middleware('auth')->group(function () {
 
     Route::view('/analytics', 'dashboard.analytics')
         ->name('analytics');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/profile', [ProfileController::class, 'index'])
         ->name('profile');

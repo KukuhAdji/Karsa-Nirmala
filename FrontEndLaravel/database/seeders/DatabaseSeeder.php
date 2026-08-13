@@ -17,10 +17,27 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => bcrypt('12345678'),
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => bcrypt('12345678'),
+            ]
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Bank Sampah
+        |--------------------------------------------------------------------------
+        |
+        | Menjalankan seeder untuk memasukkan 15 data bank sampah
+        | beserta informasi GIS dan jam operasional.
+        |
+        */
+
+        $this->call([
+            BankSampahSeeder::class,
+            BankSampahOperatingHourSeeder::class,
         ]);
     }
 }
