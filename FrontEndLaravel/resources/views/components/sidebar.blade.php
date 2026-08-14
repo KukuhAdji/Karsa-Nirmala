@@ -51,7 +51,7 @@
                            leading-snug
                            font-medium"
                 >
-                    Waste Identification & Sustainability
+                    Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
                 </p>
 
             </div>
@@ -64,6 +64,12 @@
     <!-- ========================================================= -->
     <!-- SIDEBAR CONTENT -->
     <!-- ========================================================= -->
+
+    @php
+        $isDashboard = request()->routeIs('dashboard');
+        $isScanner = request()->routeIs(['scanner', 'scanner.history']);
+        $isBankSampah = request()->routeIs('bank-sampah');
+    @endphp
 
     <div class="p-4 sidebar-scroll overflow-y-auto min-h-[calc(100vh-7rem)]">
 
@@ -82,9 +88,7 @@
             <a
                 href="{{ route('dashboard') }}"
                 class="flex items-center gap-3 p-3 rounded-2xl
-                       bg-lime-50 text-lime-700
-                       border border-lime-200
-                       shadow-sm
+                       {{ $isDashboard ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-slate-50 hover:text-lime-700' }}
                        transition-colors duration-200"
             >
 
@@ -128,8 +132,7 @@
             <a
                 href="{{ route('scanner') }}"
                 class="flex items-center gap-3 p-3 rounded-2xl
-                       hover:bg-slate-50
-                       hover:text-lime-700
+                       {{ $isScanner ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-slate-50 hover:text-lime-700' }}
                        transition-colors duration-200"
             >
 
@@ -225,14 +228,13 @@
 
 
             <!-- ================================================= -->
-            <!-- EDUCATION -->
+            <!-- GIS -->
             <!-- ================================================= -->
 
             <a
-                href="{{ route('education') }}"
+                href="{{ route('bank-sampah') }}"
                 class="flex items-center gap-3 p-3 rounded-2xl
-                       hover:bg-lime-50
-                       hover:text-lime-600
+                       {{ $isBankSampah ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-lime-50 hover:text-lime-600' }}
                        transition-colors duration-200"
             >
 
@@ -255,24 +257,20 @@
                         stroke-linejoin="round"
                     >
 
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H18" />
-
-                        <path
-                            d="M18 6.5A2.5 2.5 0 0 0 15.5 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H18"
-                        />
-
-                        <path d="M8 4v16" />
+                        <path d="M3 6l4-1 5 2 5-2 4 1v12l-4 1-5-2-5 2-4-1V6z" />
+                        <path d="M8 5v12" />
+                        <path d="M13 7v10" />
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor" />
 
                     </svg>
 
                 </span>
 
                 <span class="font-semibold">
-                    Education
+                    GIS
                 </span>
 
             </a>
-
 
             <!-- ================================================= -->
             <!-- AI CHATBOT -->

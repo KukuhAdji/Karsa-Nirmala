@@ -33,7 +33,7 @@ class DashboardController extends Controller
 
         $recentActivities = Classification::where('user_id', auth()->id())
             ->latest()
-            ->take(5)
+            ->take(3)
             ->get();
 
         // Classification trend: scan count per day for the last 7 days

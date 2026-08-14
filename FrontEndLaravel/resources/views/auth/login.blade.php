@@ -51,7 +51,7 @@ Karsa Nirmala
 </h1>
 
 <h2 class="text-4xl font-black mt-8 text-slate-800">
-Waste Identification and Sustainability Education
+Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
 </h2>
 
 <p class="mt-6 text-xl text-slate-500 max-w-xl leading-relaxed">

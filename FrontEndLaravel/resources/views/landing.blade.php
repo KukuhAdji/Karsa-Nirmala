@@ -11,8 +11,8 @@
                class="group flex items-center gap-3"
                aria-label="WISE Home">
 
-                <div class="relative w-12 h-12 shrink-0">
-                    <img src="{{ asset('images/karsa-nirmala-logo.png') }}" alt="Karsa Nirmala logo" class="h-12 w-12 object-contain drop-shadow-sm">
+                <div class="relative w-16 h-16 shrink-0">
+                    <img src="{{ asset('images/karsa-nirmala-logo.png') }}" alt="Karsa Nirmala logo" class="h-16 w-16 object-contain scale-[1.8] drop-shadow-sm">
                 </div>
 
                 <div class="leading-tight">
@@ -27,7 +27,7 @@
                     </div>
 
                     <p class="hidden sm:block mt-1 text-xs font-medium text-slate-500">
-                        Waste Identification and Sustainability Education
+                        Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
                     </p>
                 </div>
             </a>
@@ -52,11 +52,6 @@
 
             {{-- Desktop Actions and Mobile Toggle --}}
             <div class="flex items-center gap-3">
-
-                <a href="{{ route('login') }}"
-                   class="hidden md:inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition duration-200 hover:border-lime-500 hover:bg-lime-50 hover:text-lime-700 focus:outline-none focus:ring-4 focus:ring-lime-100">
-                    Login
-                </a>
 
                 <a href="{{ route('login') }}"
                    class="hidden md:inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-green-600 px-5 text-sm font-bold text-white shadow-lg shadow-lime-500/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-lime-500/30 focus:outline-none focus:ring-4 focus:ring-lime-200">
@@ -146,12 +141,7 @@
                 </a>
             </div>
 
-            <div class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-200 pt-5">
-                <a href="{{ route('login') }}"
-                   class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-lime-500 hover:bg-lime-50 hover:text-lime-700">
-                    Login
-                </a>
-
+            <div class="mt-5 grid grid-cols-1 gap-3 border-t border-slate-200 pt-5">
                 <a href="{{ route('login') }}"
                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-lime-500 to-green-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-lime-500/20 transition hover:shadow-xl">
                     Get Started
@@ -292,7 +282,12 @@
 
                     <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 shadow-sm">
                         <span class="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)]"></span>
-                        SDG-based guidance
+                        Economic value insights
+                    </span>
+
+                     <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 shadow-sm">
+                        <span class="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)]"></span>
+                        Geographic Information System (GIS) integration
                     </span>
                 </div>
 
@@ -531,15 +526,15 @@
         <div class="mx-auto mb-12 max-w-3xl text-center">
             <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-lime-200 bg-lime-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-lime-700">
                 <span class="h-2 w-2 rounded-full bg-lime-500 shadow-[0_0_12px_rgba(132,204,22,0.85)]"></span>
-                WISE in Numbers
+                Karsa Nirmala in Numbers
             </div>
 
             <h2 class="text-3xl font-black tracking-tight text-slate-900 md:text-4xl">
-                Intelligent Technology for Sustainable Action
+                Intelligent Technology for Environmental Action
             </h2>
 
             <p class="mt-4 text-base leading-relaxed text-slate-500 md:text-lg">
-                WISE combines image classification, artificial intelligence, and environmental education
+                Karsa Nirmala combines image classification, artificial intelligence, and environmental education
                 to help users identify and manage waste more responsibly.
             </p>
         </div>
@@ -608,7 +603,7 @@
                         </div>
 
                         <h3 class="text-4xl font-black tracking-tight text-blue-600 md:text-5xl">
-                            10K+
+                            3K+
                         </h3>
 
                         <p class="mt-3 text-base font-black text-slate-900">
@@ -649,7 +644,7 @@
                         </div>
 
                         <h3 class="text-4xl font-black tracking-tight text-orange-600 md:text-5xl">
-                            3
+                            4
                         </h3>
 
                         <p class="mt-3 text-base font-black text-slate-900">
@@ -835,7 +830,7 @@
                 </div>
             </article>
 
-            {{-- Sustainability Education --}}
+            {{-- Waste Education --}}
             <article class="group relative">
                 <div class="absolute -inset-1 rounded-[32px] bg-gradient-to-br from-cyan-400/60 to-blue-500/40 opacity-0 blur-xl transition duration-500 group-hover:opacity-100"></div>
 
@@ -857,16 +852,16 @@
 
                     <div class="relative mt-8">
                         <span class="inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                            SDG Education
+                            Education
                         </span>
 
                         <h3 class="mt-4 text-xl font-black leading-snug text-slate-900 transition duration-300 group-hover:text-blue-700">
-                            Sustainability Education
+                            Waste Education
                         </h3>
 
                         <p class="mt-4 text-sm leading-7 text-slate-500">
-                            Learn practical waste management methods and understand their
-                            relationship with sustainable development goals.
+                            Learn proper waste management methods 
+                            and gain information on the economic value of recyclable waste.
                         </p>
                     </div>
 
@@ -880,7 +875,7 @@
                 </div>
             </article>
 
-            {{-- Classification Analytics --}}
+            {{-- Geographic Integration System --}}
             <article class="group relative">
                 <div class="absolute -inset-1 rounded-[32px] bg-gradient-to-br from-amber-400/60 to-orange-500/40 opacity-0 blur-xl transition duration-500 group-hover:opacity-100"></div>
 
@@ -890,8 +885,8 @@
                     <div class="relative flex items-start justify-between">
                         <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 text-white shadow-lg shadow-orange-500/30 transition duration-300 group-hover:-rotate-3 group-hover:scale-110">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7">
-                                <path d="M3 3v18h18"></path>
-                                <path d="m7 16 4-5 4 3 5-7"></path>
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
                             </svg>
                         </div>
 
@@ -902,16 +897,15 @@
 
                     <div class="relative mt-8">
                         <span class="inline-flex rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-bold text-orange-700">
-                            User Analytics
+                            Geo Map
                         </span>
 
                         <h3 class="mt-4 text-xl font-black leading-snug text-slate-900 transition duration-300 group-hover:text-orange-700">
-                            Classification Analytics
+                            Geographic Integration System
                         </h3>
 
                         <p class="mt-4 text-sm leading-7 text-slate-500">
-                            Track scan activity, classification results, waste distribution,
-                            and previously identified objects.
+                            Find the nearest waste processing facility based on the type of waste.
                         </p>
                     </div>
 
@@ -941,7 +935,7 @@
             </span>
 
             <span class="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm">
-                SDG-based education
+                Economic value insights
             </span>
         </div>
 
@@ -958,7 +952,7 @@ Smart Waste AI Classification
 </h2>
 
 <p class="mt-6 text-slate-400">
-        WISE — Waste Identification and Sustainability Education
+        Karsa Nirmala —  Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
 
 </div>
 

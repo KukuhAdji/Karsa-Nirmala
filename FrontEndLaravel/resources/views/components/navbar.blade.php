@@ -52,7 +52,7 @@
                     </h1>
 
                     <p class="mt-1 text-xs text-slate-500">
-                        Waste Identification and Sustainability Education
+                        Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
                     </p>
 
                 </div>
