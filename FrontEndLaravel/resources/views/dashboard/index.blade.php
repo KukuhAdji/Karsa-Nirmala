@@ -18,7 +18,6 @@
                 <p class="mt-4 max-w-2xl text-base text-lime-50/90 md:text-lg">
                     Memayu Hayuning Bawana.
                 </p>
-
                 <div class="mt-6 flex flex-wrap gap-3">
                     <a href="{{ route('scanner') }}" class="rounded-full bg-white/15 px-4 py-2 text-sm font-bold text-white ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/20">
                         AI Scanner

@@ -2,38 +2,33 @@
 
 @section('content')
 
-<div class="space-y-8">
+<div class="mx-auto max-w-5xl space-y-6 px-4 pb-12 pt-5 sm:px-6">
 
     @if(session('success'))
-        <div class="rounded-3xl border border-lime-200 bg-lime-50 p-4 text-lime-800">
+        <div class="rounded-[24px] border border-lime-200 bg-lime-50 p-4 text-sm font-medium text-lime-800 shadow-sm">
             {{ session('success') }}
         </div>
     @endif
 
-    <div>
+    <div class="rounded-[28px] border border-slate-200/80 bg-white/80 p-4 shadow-[0_20px_55px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:p-6">
 
-        <h1 class="text-4xl font-black">
-            Karsa Nirmala Waste Scanner
-        </h1>
+        <div class="space-y-5">
 
-        <p class="text-slate-500 mt-2">
-            Use your webcam live to scan waste for fast identification.
-        </p>
+            <div class="space-y-1.5">
+                <h1 class="text-[1.8rem] font-black tracking-tight text-slate-900 sm:text-[2.6rem]">
+                    Karsa Nirmala Waste Scanner
+                </h1>
+                <p class="text-sm text-slate-500 sm:text-[0.98rem]">
+                    Use your webcam live to scan waste for fast identification.
+                </p>
+            </div>
 
-    </div>
+            <div class="space-y-6">
 
-    <div class="grid lg:grid-cols-2 gap-8">
-
-        <!-- Scanner -->
-        <div class="bg-white rounded-3xl border p-8">
-
-            <div class="text-center space-y-6">
-
-                <div class="relative rounded-3xl overflow-hidden border border-slate-200 bg-slate-900">
-
+                <div class="relative overflow-hidden rounded-[24px] border border-slate-200 bg-slate-900 shadow-[0_18px_38px_rgba(15,23,42,0.12)]">
                     <video
                         id="cameraVideo"
-                        class="hidden w-full h-[320px] object-cover"
+                        class="hidden h-[280px] w-full object-cover sm:h-[360px]"
                         autoplay
                         muted
                         playsinline>
@@ -41,41 +36,39 @@
 
                     <img
                         id="preview"
-                        class="hidden w-full h-[320px] object-cover"
+                        class="hidden h-[280px] w-full object-cover sm:h-[360px]"
                         alt="Captured preview">
 
-                    <div id="cameraFallback" class="flex items-center justify-center h-[320px] text-slate-400">
+                    <div id="cameraFallback" class="flex h-[280px] w-full items-center justify-center text-base text-slate-300 sm:h-[360px]">
                         Live camera preview will appear here.
                     </div>
-
                 </div>
 
                 <canvas id="canvas" class="hidden"></canvas>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-
+                <div class="flex flex-col items-center justify-center gap-3 sm:flex-row">
                     <button
                         id="startCamera"
                         type="button"
-                        class="px-6 py-3 rounded-2xl bg-lime-500 text-white font-bold shadow-sm hover:bg-lime-600 transition">
+                        class="w-full rounded-[18px] bg-gradient-to-r from-lime-500 to-emerald-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_14px_28px_rgba(34,197,94,0.25)] transition hover:scale-[1.01] sm:w-auto">
                         Start Camera
                     </button>
 
                     <button
                         id="captureBtn"
                         type="button"
-                        class="px-6 py-3 rounded-2xl bg-blue-500 text-white font-bold shadow-sm hover:bg-blue-600 transition hidden">
+                        class="hidden w-full rounded-[18px] bg-sky-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_14px_28px_rgba(14,165,233,0.25)] transition hover:scale-[1.01] sm:w-auto">
                         Capture Frame
                     </button>
 
                     <button
                         id="stopCamera"
                         type="button"
-                        class="px-6 py-3 rounded-2xl bg-slate-200 text-slate-700 font-bold hidden">
+                        class="hidden w-full rounded-[18px] bg-slate-200 px-6 py-3.5 text-sm font-bold text-slate-700 transition hover:bg-slate-300 sm:w-auto">
                         Stop Camera
                     </button>
 
-                    <label class="cursor-pointer bg-slate-100 border border-slate-200 px-6 py-3 rounded-2xl font-bold text-slate-700">
+                    <label class="flex w-full cursor-pointer items-center justify-center rounded-[18px] border border-slate-200 bg-slate-100 px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-200 sm:w-auto">
                         Upload Image
                         <input
                             type="file"
@@ -83,123 +76,94 @@
                             id="imageInput"
                             hidden>
                     </label>
-
                 </div>
 
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-4">
-                    <p id="cameraHint" class="text-sm text-slate-500">
-                        Allow camera access to scan waste in real time.
-                    </p>
+                <div class="rounded-[28px] border border-slate-200 bg-gradient-to-br from-lime-50 via-white to-emerald-50 p-5 sm:p-6">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div class="w-full space-y-2">
+                            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                Result
+                            </p>
+                            <h2 id="resultCategory" class="text-3xl font-black tracking-tight text-lime-600 sm:text-4xl">
+                                Waiting for scan
+                            </h2>
+
+                            <div class="space-y-2">
+                                <div class="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                                    <div id="scanProgress" class="h-full w-0 rounded-full bg-gradient-to-r from-lime-500 to-emerald-500 transition-all duration-500"></div>
+                                </div>
+                                <p id="resultCategoryType" class="text-sm text-slate-500">
+                                    Pilih gambar untuk memulai.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-end gap-2">
+                            <button
+                                id="saveScanBtn"
+                                type="button"
+                                class="hidden rounded-[18px] bg-gradient-to-r from-emerald-500 to-lime-500 px-5 py-3 text-sm font-bold text-white shadow-[0_14px_28px_rgba(34,197,94,0.25)] transition hover:scale-[1.01]">
+                                Simpan Scan
+                            </button>
+                            <p id="saveStatus" class="hidden text-xs font-semibold text-emerald-600"></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-3">
+                        <label class="text-sm font-semibold text-slate-600">
+                            Confidence
+                        </label>
+
+                        <div class="h-3.5 overflow-hidden rounded-full bg-slate-200">
+                            <div id="confidenceBar" class="h-full rounded-full bg-gradient-to-r from-lime-500 to-emerald-500" style="width: 0%"></div>
+                        </div>
+
+                        <p id="confidenceValue" class="text-base font-bold text-slate-700">
+                            0%
+                        </p>
+                    </div>
+
+                    <div id="youtubeSection" class="mt-6 hidden rounded-[22px] border border-red-100 bg-red-50 p-4">
+                        <h4 class="text-lg font-black text-slate-800">
+                            Tutorial Pengolahan Sampah
+                        </h4>
+
+                        <p id="youtubeTitle" class="mt-2 text-sm text-slate-700"></p>
+
+                        <a
+                            id="youtubeLink"
+                            href="#"
+                            target="_blank"
+                            class="mt-4 inline-flex items-center justify-center rounded-[14px] bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700">
+                            🎥 Tonton Tutorial di YouTube
+                        </a>
+                    </div>
+
+                    <div class="mt-6 rounded-[22px] border border-lime-200 bg-lime-50/80 p-4">
+                        <h4 class="text-lg font-black text-slate-800">
+                            Recycling Recommendation
+                        </h4>
+
+                        <div id="recommendations" class="mt-3 space-y-2 text-sm leading-relaxed text-slate-700">
+                            <p>• Start a scan or upload an image first.</p>
+                        </div>
+                    </div>
 
                     <button
-                        id="saveScanBtn"
-                        type="button"
-                        class="px-6 py-3 rounded-2xl bg-emerald-500 text-white font-bold shadow-sm hover:bg-emerald-600 transition hidden">
-                        Simpan Scan
+                        id="askAssistantBtn"
+                        class="mt-6 w-full rounded-[18px] bg-gradient-to-r from-lime-500 to-emerald-500 px-5 py-4 text-base font-bold text-white shadow-[0_18px_32px_rgba(34,197,94,0.28)] transition hover:scale-[1.01]">
+                        Ask AI Assistant
                     </button>
                 </div>
 
-                <p id="saveStatus" class="text-sm text-slate-500 mt-2 hidden"></p>
-
-            </div>
-
-        </div>
-
-        <!-- Result -->
-        <div class="bg-white rounded-3xl border p-8">
-
-            <h3 class="text-2xl font-black mb-6">
-                Classification Result
-            </h3>
-
-            <div class="space-y-6">
-
-                <div>
-
-                    <label class="text-sm text-slate-500">
-                        Result
-                    </label>
-
-                    <h2 id="resultCategory" class="text-4xl font-black text-lime-600">
-                        Waiting for scan
-                    </h2>
-
-                    <p id="resultCategoryType" class="text-sm text-slate-500 mt-1">
-                        Pilih gambar untuk memulai.
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p id="cameraHint" class="text-sm text-slate-500">
+                        Allow camera access to scan waste in real time.
                     </p>
-
                 </div>
-
-                <div>
-
-                    <label class="text-sm text-slate-500">
-                        Confidence
-                    </label>
-
-                    <div class="mt-2 bg-slate-200 rounded-full h-4">
-
-                        <div
-                            id="confidenceBar"
-                            class="bg-lime-500 h-4 rounded-full"
-                            style="width: 0%">
-                        </div>
-
-                    </div>
-
-                    <p id="confidenceValue" class="mt-2 font-bold">
-                        0%
-                    </p>
-
-                </div>
-
-                <div class="bg-lime-50 p-6 rounded-2xl">
-                    <div
-    id="youtubeSection"
-    class="bg-red-50 p-6 rounded-2xl hidden">
-
-    <h4 class="font-black text-lg">
-        Tutorial Pengolahan Sampah
-    </h4>
-
-    <p
-        id="youtubeTitle"
-        class="mt-2 text-slate-700">
-    </p>
-
-    <a
-        id="youtubeLink"
-        href="#"
-        target="_blank"
-        class="inline-block mt-4 px-5 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition">
-
-        🎥 Tonton Tutorial di YouTube
-
-    </a>
-
-</div>
-
-                    <h4 class="font-black text-lg">
-                        Recycling Recommendation
-                    </h4>
-
-                    <div id="recommendations" class="mt-3 text-slate-700">
-                        <li>• Start a scan or upload an image first.</li>
-                    </div>
-
-                </div>
-
-                <button
-                    id="askAssistantBtn"
-                    class="w-full bg-lime-500 text-white py-4 rounded-2xl font-bold hover:bg-lime-600 transition">
-                    Ask AI Assistant
-                </button>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
@@ -223,6 +187,7 @@ const resultCategoryType = document.getElementById('resultCategoryType');
 const confidenceBar = document.getElementById('confidenceBar');
 const confidenceValue = document.getElementById('confidenceValue');
 const recommendations = document.getElementById('recommendations');
+const scanProgress = document.getElementById('scanProgress');
 
 let cameraStream = null;
 let currentImageFile = null;
@@ -231,9 +196,9 @@ let currentPredictedClass = null;
 let currentRecommendations = [
     'Start a scan or upload an image first.'
 ];
-let currentYoutube = {  // Variable baru untuk YouTube dinamis
-    title: "Tutorial Pengelolaan Sampah",
-    url: "#"
+let currentYoutube = {
+    title: 'Tutorial Pengelolaan Sampah',
+    url: '#'
 };
 
 const classLabels = {
@@ -276,82 +241,6 @@ const categoryRecommendations = {
     ]
 };
 
-const youtubeVideos = {
-    organik: {
-        title: "Tutorial Membuat Kompos dari Sampah Organik",
-        url: "https://youtu.be/0qfGNQ499JA?si=t3Epxd-PAPQK6duC"
-    },
-
-    anorganik: {
-        title: "Daur Ulang Sampah Anorganik: Plastik, Kertas, Kaca, dan Logam",
-        url: "https://youtu.be/oVOgpI_V8OY?si=ptppcvAtgp1ir4lY"
-    },
-
-    'e-waste': {
-        title: "Pengelolaan Limbah Elektronik yang Benar",
-        url: "https://youtube.com/playlist?list=PLHWBteJlBKUqp-qxOU_eOvFg7qILUjGbm&si=5E9k5LsarX2L2Han"
-    }
-};
-
-// CSS untuk recommendations
-const recommendationsStyle = `
-    .recommendations-container {
-        font-size: 14px;
-        line-height: 1.6;
-        color: #334155;
-    }
-    .intro-text {
-        font-weight: 600;
-        color: #16a34a;
-        margin-bottom: 1rem;
-        font-size: 16px;
-    }
-    .recommendations-section,
-    .sdgs-section {
-        margin: 1.5rem 0;
-    }
-    .recommendations-section h4,
-    .sdgs-section h4 {
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.75rem;
-        font-size: 15px;
-    }
-    .recommendations-list,
-    .sdgs-list {
-        margin-left: 1.5rem;
-        list-style-type: decimal;
-    }
-    .recommendations-list li,
-    .sdgs-list li {
-        margin-bottom: 0.5rem;
-        padding-left: 0.25rem;
-    }
-    .closing-text {
-        margin-top: 1rem;
-        color: #64748b;
-        font-style: italic;
-    }
-    .warning-box {
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #fef08a;
-        border-left: 4px solid #eab308;
-        border-radius: 0.375rem;
-    }
-    .warning-box p {
-        color: #b45309;
-        font-size: 14px;
-        line-height: 1.5;
-        margin: 0;
-    }
-`;
-
-// Inject CSS
-const styleElement = document.createElement('style');
-styleElement.textContent = recommendationsStyle;
-document.head.appendChild(styleElement);
-
 function showPreview(imageSrc) {
     preview.src = imageSrc;
     preview.classList.remove('hidden');
@@ -373,31 +262,21 @@ function getRecommendations(category, predictedClass) {
 }
 
 function updateYoutubeTutorial(category) {
+    const youtubeSection = document.getElementById('youtubeSection');
+    const youtubeTitle = document.getElementById('youtubeTitle');
+    const youtubeLink = document.getElementById('youtubeLink');
 
-    const youtubeSection =
-        document.getElementById('youtubeSection');
-
-    const youtubeTitle =
-        document.getElementById('youtubeTitle');
-
-    const youtubeLink =
-        document.getElementById('youtubeLink');
-
-    // Gunakan YouTube data dari API
-    // Ini bisa dari Gemma attempt pertama, atau fallback hardcoded jika Gemma gagal
     if (currentYoutube && currentYoutube.title && currentYoutube.url && currentYoutube.url !== '#') {
         youtubeTitle.textContent = currentYoutube.title;
         youtubeLink.href = currentYoutube.url;
-        youtubeLink.onclick = null;  // Clear onclick handler
+        youtubeLink.onclick = null;
         youtubeSection.classList.remove('hidden');
         return;
     }
 
-    // Jika API return URL '#' atau kosong (Gemma completely failed)
-    // Tampilkan pesan informatif daripada hide section
-    youtubeTitle.textContent = "Tutorial sedang dimuat...";
-    youtubeLink.textContent = "🎥 Tonton Tutorial di YouTube";
-    youtubeLink.href = "#";
+    youtubeTitle.textContent = 'Tutorial sedang dimuat...';
+    youtubeLink.textContent = '🎥 Tonton Tutorial di YouTube';
+    youtubeLink.href = '#';
     youtubeLink.onclick = (e) => {
         e.preventDefault();
         alert("Maaf, tutorial untuk sampah jenis ini sedang dicari. Silakan coba lagi atau search manual di YouTube dengan kata kunci: 'daur ulang " + category + "'");
@@ -411,19 +290,18 @@ function updateResult(label, categoryKey, confidence, recommendationsText) {
 
     resultCategory.textContent = label;
     resultCategoryType.textContent = categoryNames[categoryKey] || categoryNames.anorganik;
+    scanProgress.style.width = '100%';
 
     confidenceBar.style.width = `${confidence}%`;
     confidenceValue.textContent = `${confidence}%`;
 
     currentRecommendations = recommendationsText;
-    
-    // Jika recommendationsText adalah string HTML (dari API Gemma)
+
     if (typeof recommendationsText === 'string') {
         recommendations.innerHTML = recommendationsText;
     } else if (Array.isArray(recommendationsText)) {
-        // Fallback untuk array (legacy)
         recommendations.innerHTML = recommendationsText
-            .map(item => `<li>• ${item}</li>`)
+            .map(item => `<p>• ${item}</p>`)
             .join('');
     }
 
@@ -432,18 +310,22 @@ function updateResult(label, categoryKey, confidence, recommendationsText) {
 }
 
 function setStatus(message, isError = false) {
-    saveStatus.textContent = message;
-    saveStatus.classList.remove('text-slate-500', 'text-green-600', 'text-red-600');
-    saveStatus.classList.add(isError ? 'text-red-600' : 'text-green-600');
-    saveStatus.classList.remove('hidden');
+    const statusText = isError ? message : message;
+    resultCategoryType.textContent = statusText;
+    scanProgress.style.width = isError ? '40%' : '60%';
+    if (isError) {
+        scanProgress.classList.remove('from-lime-500', 'to-emerald-500');
+        scanProgress.classList.add('from-red-500', 'to-rose-500');
+    } else {
+        scanProgress.classList.remove('from-red-500', 'to-rose-500');
+        scanProgress.classList.add('from-lime-500', 'to-emerald-500');
+    }
 }
 
 async function startCamera() {
     try {
         cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'environment'
-            },
+            video: { facingMode: 'environment' },
             audio: false
         });
 
@@ -485,16 +367,13 @@ async function saveScan() {
 
     const category = currentCategoryKey || 'anorganik';
     const confidence = parseFloat(confidenceValue.textContent.replace('%', '')) || 0;
-    
-    // Handle both string (HTML dari Gemma) dan array (legacy)
+
     let recommendationText = '';
     if (typeof currentRecommendations === 'string') {
-        // Extract text dari HTML, remove tags
         const temp = document.createElement('div');
         temp.innerHTML = currentRecommendations;
         recommendationText = temp.textContent || temp.innerText || '';
     } else if (Array.isArray(currentRecommendations)) {
-        // Array format
         recommendationText = currentRecommendations.join('\n');
     } else {
         recommendationText = 'Rekomendasi pengelolahan sampah sesuai kategori.';
@@ -508,6 +387,9 @@ async function saveScan() {
 
     saveScanBtn.disabled = true;
     saveScanBtn.textContent = 'Menyimpan...';
+    saveStatus.textContent = 'Sedang menyimpan scan...';
+    saveStatus.classList.remove('hidden', 'text-red-600');
+    saveStatus.classList.add('text-emerald-600');
 
     try {
         const response = await fetch("{{ route('scanner.upload') }}", {
@@ -528,11 +410,23 @@ async function saveScan() {
             throw new Error(result.message || 'Terjadi kesalahan saat menyimpan scan.');
         }
 
-        setStatus('Scan berhasil disimpan ke database.');
+        saveStatus.textContent = 'Penyimpanan selesai ✓';
+        saveStatus.classList.remove('hidden', 'text-red-600');
+        saveStatus.classList.add('text-emerald-600');
+        saveScanBtn.textContent = 'Tersimpan';
+        resultCategoryType.textContent = 'Scan berhasil disimpan ke database.';
+        scanProgress.style.width = '100%';
         currentImageFile = null;
-        saveScanBtn.textContent = 'Simpan Scan';
         saveScanBtn.disabled = false;
+
+        setTimeout(() => {
+            saveStatus.classList.add('hidden');
+            saveScanBtn.textContent = 'Simpan Scan';
+        }, 1800);
     } catch (error) {
+        saveStatus.textContent = 'Gagal menyimpan scan';
+        saveStatus.classList.remove('hidden', 'text-emerald-600');
+        saveStatus.classList.add('text-red-600');
         setStatus(error.message, true);
         saveScanBtn.textContent = 'Simpan Scan';
         saveScanBtn.disabled = false;
@@ -546,7 +440,11 @@ async function classifyImage(file) {
         return;
     }
 
-    setStatus('Menganalisis gambar, tunggu sebentar...');
+    scanProgress.classList.remove('from-red-500', 'to-rose-500');
+    scanProgress.classList.add('from-lime-500', 'to-emerald-500');
+    scanProgress.style.width = '30%';
+    resultCategory.textContent = 'Waiting for scan';
+    resultCategoryType.textContent = 'Sedang menganalisis gambar...';
 
     const formData = new FormData();
     formData.append('file', file);
@@ -563,24 +461,27 @@ async function classifyImage(file) {
             throw new Error(data.detail || data.error || 'Prediksi gagal.');
         }
 
+        scanProgress.style.width = '75%';
+
         const classLabel = getReadableLabel(data.predicted_class);
         const categoryKey = data.category || 'anorganik';
         const categoryLabel = categoryNames[categoryKey] || categoryNames.anorganik;
         const confidencePercent = Math.round((data.confidence || 0) * 10000) / 100;
-        
-        // Gunakan recommendation dari API (dari Gemma), jika tidak ada fallback ke local
         const recommendationsText = data.recommendation || getRecommendations(categoryKey, data.predicted_class);
-        
-        // Ambil YouTube link dari API (dari Gemma)
+
         if (data.youtube) {
             currentYoutube = data.youtube;
         }
 
         updateResult(classLabel, categoryKey, confidencePercent, recommendationsText);
-        setStatus(`Prediksi selesai: ${classLabel} (${categoryLabel}).`);
+        resultCategoryType.textContent = `Prediksi selesai: ${categoryLabel}`;
         currentImageFile = file;
     } catch (error) {
-        setStatus(error.message || 'Terjadi kesalahan saat memprediksi gambar.', true);
+        scanProgress.style.width = '100%';
+        resultCategory.textContent = 'Scan failed';
+        resultCategoryType.textContent = error.message || 'Terjadi kesalahan saat memprediksi gambar.';
+        scanProgress.classList.remove('from-lime-500', 'to-emerald-500');
+        scanProgress.classList.add('from-red-500', 'to-rose-500');
         console.error(error);
     }
 }

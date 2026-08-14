@@ -12,7 +12,7 @@
                aria-label="WISE Home">
 
                 <div class="relative w-12 h-12 shrink-0">
-                    <img src="{{ asset('images/karsa-nirmala-logo.svg') }}" alt="Karsa Nirmala logo" class="h-12 w-12 object-contain drop-shadow-sm">
+                    <img src="{{ asset('images/karsa-nirmala-logo.png') }}" alt="Karsa Nirmala logo" class="h-12 w-12 object-contain drop-shadow-sm">
                 </div>
 
                 <div class="leading-tight">

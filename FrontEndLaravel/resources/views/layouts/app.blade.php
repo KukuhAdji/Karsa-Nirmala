@@ -83,9 +83,9 @@
 
 @stack('scripts')
 
-<div id="floatingChatbot" class="fixed z-50 flex cursor-grab items-center justify-center rounded-full bg-gradient-to-br from-lime-400 to-green-600 p-4 text-2xl text-white shadow-[0_24px_50px_rgba(34,197,94,0.35)] transition-all duration-200 active:cursor-grabbing hover:scale-105">
-    <a href="{{ route('chatbot') }}" class="flex items-center justify-center" aria-label="Open AI Chatbot" title="AI Chatbot">
-        🤖
+<div id="floatingChatbot" class="fixed z-50 flex cursor-grab items-center justify-center rounded-full bg-gradient-to-br from-lime-300 via-emerald-300 to-green-400 p-0 text-2xl text-white shadow-[0_24px_60px_rgba(74,222,128,0.35)] transition-all duration-200 active:cursor-grabbing hover:scale-105">
+    <a href="{{ route('chatbot') }}" class="flex h-[5rem] w-[5rem] items-center justify-center overflow-hidden rounded-full border-4 border-white/60 bg-white/10 backdrop-blur-sm" aria-label="Open AI Chatbot" title="AI Chatbot">
+        <img src="{{ asset('images/chatbot-avatar-peri.png') }}" alt="AI Chatbot" class="h-full w-full object-cover rounded-full">
     </a>
 </div>
 

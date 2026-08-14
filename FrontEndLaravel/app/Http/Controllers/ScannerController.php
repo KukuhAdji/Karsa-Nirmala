@@ -43,7 +43,8 @@ class ScannerController extends Controller
 
     public function history()
     {
-        $histories = Classification::latest()
+        $histories = Classification::where('user_id', auth()->id())
+            ->latest()
             ->paginate(10);
 
         return view(
