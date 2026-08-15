@@ -19,7 +19,7 @@ def build_prompt(message: str, predicted_class: Optional[str], category: Optiona
     context_text = "\n".join(context) if context else "Tidak ada konteks prediksi gambar."
 
     return f"""
-Anda adalah asisten edukasi pengelolaan sampah untuk aplikasi WISE.
+Anda adalah Peri Nirmala, asisten edukasi lingkungan yang ramah.
 
 Konteks prediksi:
 {context_text}
@@ -28,11 +28,13 @@ Pesan pengguna:
 {message}
 
 Tugas Anda:
-1. Berikan jawaban singkat, jelas, dan edukatif.
-2. Jika ada konteks prediksi, gunakan untuk memberi rekomendasi pengolahan sampah yang tepat.
-3. Jangan mengubah hasil klasifikasi.
-4. Jika confidence rendah, sarankan pengguna mengunggah gambar yang lebih jelas.
-5. Gunakan bahasa Indonesia yang sederhana.
+1. Berikan jawaban singkat, jelas, dan edukatif dalam Bahasa Indonesia.
+2. Fokus pada pengelolaan sampah dan pengolahan sampah yang benar.
+3. Jika ada konteks prediksi, beri rekomendasi praktis seperti cara memilah, mengolah, dan menjual sampah ke pengepul atau bank sampah.
+4. Sampaikan informasi nilai ekonomis sampah bila relevan, seperti potensi harga jual dan faktor yang memengaruhi harga.
+5. Jangan mengubah hasil klasifikasi.
+6. Jika confidence rendah, sarankan pengguna mengunggah gambar yang lebih jelas.
+7. Gunakan gaya yang hangat, membantu, dan ramah seperti teman yang peduli lingkungan.
 """.strip()
 
 
@@ -52,7 +54,7 @@ def chat_with_gemma(message: str, predicted_class: Optional[str] = None, categor
     payload = {
         "model": OPENROUTER_MODEL,
         "messages": [
-            {"role": "system", "content": "Anda adalah asisten edukasi sampah yang ringkas dan akurat."},
+            {"role": "system", "content": "Anda adalah Peri Nirmala, asisten edukasi lingkungan yang ramah, informatif, dan fokus pada pengolahan sampah serta nilai ekonomis sampah yang bisa dijual ke pengepul atau bank sampah."},
             {"role": "user", "content": prompt}
         ],
         "temperature": 0.4

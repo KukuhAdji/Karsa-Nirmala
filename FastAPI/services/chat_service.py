@@ -28,34 +28,21 @@ OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 # Cache untuk mengurangi API calls
 _response_cache = {}
 
-# Pemetaan jenis sampah ke rekomendasi SDGs
+# Pemetaan jenis sampah ke rekomendasi pengolahan dan nilai ekonomi
 WASTE_CLASS_INFO = {
-    "botol_plastik": {"sdgs": [12, 13, 14], "category": "Organik"},
-    "botol_kaca": {"sdgs": [12, 15], "category": "Anorganik"},
-    "kaleng_minuman": {"sdgs": [12, 13, 14, 15], "category": "Anorganik"},
-    "kardus": {"sdgs": [6, 12], "category": "Anorganik"},
-    "kertas": {"sdgs": [6, 12, 13, 15], "category": "Anorganik"},
-    "bungkus_plastik_makanan": {"sdgs": [12, 14], "category": "Anorganik"},
-    "cup_plastik": {"sdgs": [12, 14, 15], "category": "Anorganik"},
-    "sisa_makanan": {"sdgs": [2, 12, 13], "category": "Organik"},
-    "buah_sayur": {"sdgs": [2, 12, 13], "category": "Organik"},
-    "pakaian": {"sdgs": [1, 10, 12], "category": "Anorganik"},
-    "sepatu": {"sdgs": [1, 10, 12], "category": "Anorganik"},
-    "battery": {"sdgs": [3, 6, 12, 15], "category": "E-Waste"},
-    "accu": {"sdgs": [3, 6, 12], "category": "E-Waste"}
-}
-
-# Deskripsi SDGs
-SDG_DESCRIPTIONS = {
-    1: "Tidak ada Kemiskinan",
-    2: "Tanpa Kelaparan",
-    3: "Kesehatan dan Kesejahteraan",
-    6: "Air Bersih dan Sanitasi",
-    10: "Pengurangan Kesenjangan",
-    12: "Konsumsi dan Produksi Berkelanjutan",
-    13: "Penanganan Perubahan Iklim",
-    14: "Kehidupan di Bawah Air",
-    15: "Kehidupan di Darat"
+    "botol_plastik": {"category": "Anorganik", "handling": "Cuci bersih, pisahkan tutup dan label, lalu kumpulkan untuk daur ulang menjadi biji plastik atau produk lain.", "economic_value": "Kisaran harga umum di pasaran sekitar Rp 1.500–Rp 4.000 per kg untuk botol PET bersih dan kering, tergantung warna, kebersihan, dan permintaan pengepul."},
+    "botol_kaca": {"category": "Anorganik", "handling": "Pisahkan dari sampah lain, bersihkan, dan simpan terpisah untuk dijual ke pengepul kaca.", "economic_value": "Kisaran harga umum sekitar Rp 300–Rp 1.500 per kg, tergantung jenis kaca, kebersihan, dan kondisi botol yang tidak pecah."},
+    "kaleng_minuman": {"category": "Anorganik", "handling": "Bilas, tekan agar ringkas, lalu kumpulkan untuk pengepul logam.", "economic_value": "Kisaran harga umum sekitar Rp 2.000–Rp 6.000 per kg untuk kaleng bekas, tergantung kadar logam dan berat."},
+    "kardus": {"category": "Anorganik", "handling": "Keringkan, peras, dan satukan agar lebih ringan saat disetor ke bank sampah atau pengepul kertas.", "economic_value": "Kisaran harga umum sekitar Rp 500–Rp 2.500 per kg, bergantung pada kebersihan, kadar kertas, serta pasar lokal."},
+    "kertas": {"category": "Anorganik", "handling": "Pisahkan dari kertas basah atau terkontaminasi, jemur, lalu kumpulkan untuk daur ulang.", "economic_value": "Kisaran harga umum sekitar Rp 800–Rp 3.000 per kg untuk kertas bekas bersih, tergantung jenis kertas dan kualitasnya."},
+    "bungkus_plastik_makanan": {"category": "Anorganik", "handling": "Cuci, keringkan, dan pisahkan agar tidak tercampur sampah basah.", "economic_value": "Kisaran harga umum biasanya Rp 500–Rp 2.000 per kg, tetapi bisa lebih rendah jika kondisi plastik kotor, lembab, atau tercampur sampah lain."},
+    "cup_plastik": {"category": "Anorganik", "handling": "Bersihkan dari sisa minuman, keringkan, dan pisahkan untuk recycle.", "economic_value": "Kisaran harga umum sekitar Rp 500–Rp 2.500 per kg, tergantung jenis plastik dan kondisi cup yang dikumpulkan."},
+    "sisa_makanan": {"category": "Organik", "handling": "Komposkan atau olah jadi pakan ternak bila sesuai, hindari membuang ke tempat sampah umum.", "economic_value": "Umumnya tidak dijual dalam bentuk mentah, tetapi bisa menghasilkan kompos atau biogas yang memberi nilai ekonomis jangka panjang melalui penghematan biaya pembuangan dan pupuk."},
+    "buah_sayur": {"category": "Organik", "handling": "Kumpulkan untuk composting atau pengolahan pupuk organik rumah tangga.", "economic_value": "Nilai ekonomi bisa muncul dari kompos atau pupuk cair untuk kebun; jika diolah secara mandiri, manfaatnya bisa setara dengan pengurangan biaya pupuk."},
+    "pakaian": {"category": "Anorganik", "handling": "Cuci, sortir layak pakai dan yang rusak, lalu donasikan atau jual ke pengepul tekstil.", "economic_value": "Pakaian layak pakai bisa laku Rp 10.000–Rp 100.000 per koleksi tergantung kondisi, merek, dan pasar; kain rusak bisa dijadikan bahan daur ulang atau serat kain."},
+    "sepatu": {"category": "Anorganik", "handling": "Cuci dan pisahkan berdasarkan kondisi, lalu bisa dijual kembali, didonasikan, atau diolah jadi bahan daur ulang.", "economic_value": "Harga jual umumnya bervariasi, mulai dari Rp 20.000 hingga ratusan ribu per pasang tergantung kondisi, merek, dan kelayakan pakai."},
+    "battery": {"category": "E-Waste", "handling": "Jangan dibuang sembarangan. Simpan di wadah tertutup dan serahkan ke pengepul limbah B3 atau bank sampah yang menerima baterai.", "economic_value": "Baterai bekas biasanya memiliki nilai ekonomis bila diproses lewat pengelolaan B3 yang aman, meski harga setiap jenis baterai berbeda-beda sesuai material logamnya."},
+    "accu": {"category": "E-Waste", "handling": "Pisahkan dan serahkan ke tempat daur ulang aki yang aman agar tidak merusak lingkungan.", "economic_value": "Aki bekas memiliki nilai ekonomis karena mengandung timbal dan logam lain yang bisa didaur ulang secara formal, namun pengelolaannya harus aman dan sesuai aturan."}
 }
 
 
@@ -76,7 +63,7 @@ def build_prompt(
 
     context_text = "\n".join(context_lines) if context_lines else "Tidak ada konteks prediksi gambar."
 
-    return f"""Anda adalah WISE AI Assistant - asisten ramah yang membantu edukasi pengelolaan sampah dan sustainability.
+    return f"""Anda adalah Peri Nirmala, asisten edukasi lingkungan yang ramah, hangat, dan peka terhadap isu sampah serta pengelolaannya.
 
 Konteks prediksi sampah saat ini:
 {context_text}
@@ -86,33 +73,38 @@ Pesan pengguna:
 
 PANDUAN RESPONS Anda:
 1. TONE & MANNER:
-   - Gunakan bahasa ramah, hangat, dan conversational
+   - Gunakan bahasa Indonesia yang lugas, hangat, dan mudah dipahami
    - Panggil pengguna dengan "Kamu" atau "Anda" secara natural
-   - Gunakan emoji relevant untuk membuat percakapan lebih engaging 😊
-   - Hindari terkesan formal atau robotic
+   - Gunakan emoji yang sesuai agar terasa lebih hidup dan manusiawi 😊♻️💰
+   - Hindari terdengar terlalu formal atau robotik
 
-2. JIKA PERTANYAAN RELEVAN (tentang sampah, daur ulang, sustainability):
-   - Berikan jawaban jelas, edukatif, dan actionable
-   - Gunakan data/fakta jika relevan
-   - Hubungkan dengan SDGs jika memungkinkan
-   - Jika ada konteks prediksi, gunakan untuk rekomendasi spesifik
+2. JIKA PERTANYAAN RELEVAN (tentang sampah, daur ulang, pengelolaan limbah, dan nilai ekonomis sampah):
+   - Berikan jawaban yang jelas, edukatif, dan praktis
+   - Jelaskan cara pengolahan atau pengelolaan yang benar
+   - Jelaskan apakah sampah tersebut bisa dijual ke pengepul atau bank sampah, serta kisaran nilai ekonomisnya jika ada
+   - Jika ada konteks prediksi, gunakan untuk memberi rekomendasi yang spesifik dan bermanfaat
+   - Fokus pada pengelolaan sampah secara berkelanjutan, pemisahan sampah, daur ulang, komposting, dan potensi nilai ekonomi
 
-3. JIKA PERTANYAAN DILUAR KONTEKS (tidak sesuai dengan tema WISE):
-   - Tegur dengan SOPAN dan RAMAH (jangan kaku)
-   - Jelaskan bahwa WISE fokus pada edukasi sampah & sustainability
-   - Tawarkan topik yang BISA kami bantu
-   - Contoh topik: cara daur ulang, jenis sampah, pengolahan limbah, sustainability, SDGs, kompos, daur ulang, pengelolaan limbah elektronik, dll
-   - Berakhir dengan ajakan untuk bertanya tentang topik yang sesuai
+3. JIKA PERTANYAAN DILUAR KONTEKS:
+   - Tegur dengan SOPAN dan RAMAH
+   - Jelaskan bahwa Peri Nirmala fokus pada edukasi pengelolaan sampah, pengolahan limbah, dan nilai ekonomis sampah
+   - Tawarkan topik yang bisa dibantu, seperti: cara memilah sampah, daur ulang, pengolahan kompos, manfaat bank sampah, harga sampah di pengepul, pengelolaan sampah rumah tangga, dan limbah elektronik
+   - Akhiri dengan ajakan ramah untuk bertanya topik yang sesuai
 
 4. CONTOH TEGUR SOPAN:
-   - "Hmm, sepertinya pertanyaan ini diluar fokus WISE ya 😊. Kami spesialisasi di edukasi sampah & sustainability. Mau tanya seputar cara daur ulang, pengelolaan sampah, atau sustainability?"
-   - "Menarik pertanyaannya, tapi itu diluar expertise kami nih 💚. WISE fokus di waste management dan edukasi lingkungan. Ada yang ingin tahu tentang pengelolaan sampah?"
+   - "Hmm, sepertinya pertanyaan ini di luar fokus Peri Nirmala ya 😊. Kami fokus pada edukasi pengelolaan sampah, pengolahan limbah, dan nilai ekonomis sampah seperti yang bisa dijual ke pengepul atau bank sampah. Mau tanya mengenai cara memilah sampah atau harga sampah bekas?"
+   - "Pertanyaannya menarik, tapi fokus kami lebih ke pengelolaan sampah dan ekonomi sirkular 💚. Kalau kamu mau, kita bisa bahas cara mengolah sampah rumah tangga atau potensi nilai jualnya."
 
 5. JIKA CONFIDENCE PREDIKSI RENDAH:
-   - Sarankan pengguna upload gambar yang lebih jelas
-   - Berikan tips cara mengambil foto sampah yang baik
+   - Sarankan pengguna mengunggah foto yang lebih jelas
+   - Berikan tips pengambilan gambar sampah agar klasifikasi lebih akurat
 
-Ingat: Setiap respons harus terasa seperti percakapan dengan teman yang peduli lingkungan, bukan bot formal!
+6. PRIORITAS KONTEN:
+   - Berikan edukasi tentang cara mengolah sampah secara benar
+   - Tampilkan potensi nilai ekonomis jika dijual ke pengepul atau bank sampah
+   - Jelaskan manfaat dari memilah sampah, mendaur ulang, dan mengurangi sampah yang berakhir di tempat pembuangan
+
+Ingat: Respons harus terasa seperti ngobrol dengan teman yang peduli lingkungan, bukan bot formal.
 """.strip()
 
 
@@ -145,10 +137,10 @@ def chat_with_gemma(
         "messages": [
             {
                 "role": "system",
-                "content": """Kamu adalah WISE AI Assistant - teman ramah yang passionate tentang edukasi sampah dan sustainability. 
-Kamu bicara natural, warm, dan engaging. Tidak formal-formal amat. Percakapan dengan kamu seperti ngobrol sama teman yang peduli lingkungan. 
-Gunakan emoji, natural language, dan jangan ragu untuk menegur dengan sopan kalau pertanyaan out of scope. 
-Selalu helpful dan supportive terhadap setiap usaha pengguna untuk sustainable living! 💚"""
+                "content": """Kamu adalah Peri Nirmala, asisten edukasi lingkungan yang ramah dan peka terhadap pengelolaan sampah. 
+Kamu bicara natural, warm, dan mendorong orang untuk ikut menjaga lingkungan dengan cara yang mudah dipahami. 
+Fokus utamamu adalah edukasi tentang pengolahan sampah, cara memilah sampah, manfaat daur ulang, serta nilai ekonomis sampah jika dijual ke pengepul atau bank sampah. 
+Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji secukupnya agar terasa menyenangkan. 💚♻️💰"""
             },
             {
                 "role": "user",
@@ -223,41 +215,60 @@ def build_recommendation_prompt(
     category: str,
     confidence: float
 ) -> str:
-    """Build prompt untuk menghasilkan rekomendasi pengolahan sampah dari Gemma dengan struktur yang jelas."""
+    """Build prompt untuk menghasilkan rekomendasi pengolahan sampah, harga pasar per kg, dan opsi daur ulang mandiri yang konkret."""
     waste_info = WASTE_CLASS_INFO.get(predicted_class.lower(), {})
-    sdgs = waste_info.get("sdgs", [])
-    sdg_list = ", ".join([f"SDG {sdg}: {SDG_DESCRIPTIONS.get(sdg, 'Unknown')}" for sdg in sdgs])
+    handling = waste_info.get("handling", "Pisahkan dari sampah lain dan olah sesuai jenis sampah.")
+    economic_value = waste_info.get("economic_value", "Nilai ekonomis tergantung kualitas, berat, dan permintaan pasar.")
     readable_class = predicted_class.replace('_', ' ').title()
-    
-    return f"""Kamu diminta untuk memberikan REKOMENDASI PENGOLAHAN SAMPAH dalam format yang TERSTRUKTUR dan RAPI.
+
+    return f"""Kamu diminta untuk menghasilkan REKOMENDASI PENGELOLAAN SAMPAH yang sangat praktis, lebih panjang, dan benar-benar berguna bagi pengguna.
 
 KONTEKS SAMPAH:
 - Jenis Sampah: {readable_class}
 - Kategori: {category}
-- SDGs Relevan: {sdg_list}
+- Cara Pengolahan Umum: {handling}
+- Informasi Harga Pasar: {economic_value}
+
+TUGAS UTAMA:
+Buat respons yang bisa menjawab 3 kebutuhan pengguna sekaligus:
+1. Cara pengolahan sampah yang benar
+2. Kisaran harga jual di pasaran atau ke pengepul/bank sampah
+3. Opsi daur ulang mandiri jika memungkinkan, lengkap dengan langkah sederhana yang bisa dilakukan sendiri di rumah
+
+PENTING: output harus dibuat dengan format nomor urut yang rapi, bukan paragraf panjang tanpa struktur.
 
 BERIKAN RESPONS DENGAN FORMAT BERIKUT (PERSIS seperti ini):
 
-REKOMENDASI PENGOLAHAN UNTUK SAMPAH {readable_class.upper()}:
-1. [Cara Pengolahan Pertama - penjelasan singkat dan praktis]
-2. [Cara Pengolahan Kedua - penjelasan singkat dan praktis]
-3. [Cara Pengolahan Ketiga - penjelasan singkat dan praktis]
-(Tambahkan lebih banyak nomor jika ada, maksimal 5)
+REKOMENDASI PENGELOLAAN UNTUK SAMPAH {readable_class.upper()}:
+1. [Penjelasan langkah pertama pengolahan yang benar dan aman, dibuat lebih detail daripada jawaban singkat]
+2. [Penjelasan langkah kedua: pemisahan, pencucian, pengeringan, dan penyimpanan agar nilai ekonomis tetap tinggi]
+3. [Penjelasan langkah ketiga: persiapan agar sampah lebih siap dijual atau diolah lebih lanjut]
+4. [Penjelasan langkah keempat: jika memungkinkan, uraikan cara daur ulang mandiri yang bisa dilakukan di rumah atau lingkungan sekitar]
+5. [Penjelasan langkah kelima: tindakan tambahan seperti kompos, recycle kreatif, pengemasan, atau penyimpanan agar lebih efisien]
 
-DAMPAK SUSTAINABLE DEVELOPMENT GOALS (SDGs):
-1. [Nomor dan nama SDG + penjelasan dampak singkat]
-2. [Nomor dan nama SDG + penjelasan dampak singkat]
-(Hanya untuk SDG yang relevan)
+KISARAN HARGA PASAR PER 1 KG:
+1. [Berikan kisaran harga yang realistis untuk pasar lokal dalam satuan rupiah per 1 kilogram. Contoh: Rp 1.500–Rp 4.000 per kg]
+2. [Jelaskan faktor yang memengaruhi harga, seperti kebersihan, berat, warna, kondisi, dan pasar setempat]
+3. [Jika harga bisa sangat bervariasi, sebutkan bahwa estimasi bisa naik/turun tergantung volume, kondisi, dan penampungan]
+
+PENGOLAHAN MANDIRI JIKA DIMUNGKINKAN:
+1. [Jika bisa diolah sendiri, jelaskan langkah-langkah sederhana dan aman untuk daur ulang mandiri di rumah]
+2. [Sebutkan alat yang dibutuhkan, misalnya wadah, air, alat pemotong, atau alat pengering]
+3. [Jelaskan manfaat dari proses mandiri, seperti menghemat biaya, menambah nilai tambah, dan mengurangi sampah]
+4. [Jika tidak bisa diolah sendiri, berikan alasan singkat dan sebutkan alternatif terbaik seperti bank sampah atau pengepul]
 
 PENUTUP:
-[Kalimat motivasi singkat dan ramah untuk pengguna - 1-2 kalimat saja]
+[Kalimat motivasi singkat yang mendorong pengguna untuk memilah, mengolah, dan menjual atau mendaur ulang sampah dengan benar]
 
 PANDUAN PENULISAN:
-- Gunakan bahasa yang ramah, natural, dan engaging
-- Tambahkan emoji relevant di berbagai tempat
-- Setiap poin harus konkret dan actionable
-- Hindari penjelasan panjang-panjang - singkat dan to the point
-- Gunakan Bahasa Indonesia
+- Gunakan bahasa Indonesia yang natural, ramah, dan praktis
+- Tambahkan emoji yang relevan, tapi jangan berlebihan
+- Setiap bagian harus berupa daftar bernomor, bukan paragraf panjang tanpa urutan
+- Wajib mencantumkan harga dalam satuan rupiah per 1 kilogram, misalnya Rp 1.500–Rp 4.000 per kg
+- Wajib menyebutkan opsi daur ulang mandiri jika sampah itu memang bisa diolah sendiri
+- Fokus pada pengolahan sampah, nilai ekonomi, dan solusi nyata
+- Jangan menulis kalimat yang terlalu umum atau terlalu singkat
+- Jangan yang jawabannya berparagraf panjang tanpa nomor urut
 
 JANGAN TAMBAHKAN APAPUN SELAIN FORMAT DI ATAS - tidak ada intro, tidak ada kalimat tambahan di awal atau akhir!""".strip()
 
@@ -304,7 +315,7 @@ def get_formatted_waste_recommendation(
         "messages": [
             {
                 "role": "system",
-                "content": "Kamu adalah asisten yang ahli dalam memberikan rekomendasi pengelolaan sampah dengan struktur terorganisir, ramah, dan actionable. Selalu ikuti format yang diminta dengan tepat."
+                "content": "Kamu adalah Peri Nirmala, asisten yang ahli dalam memberikan rekomendasi pengelolaan sampah dengan struktur terorganisir, ramah, dan actionable. Selalu ikuti format yang diminta dengan tepat."
             },
             {
                 "role": "user",
@@ -399,58 +410,58 @@ def get_formatted_waste_recommendation(
 def _parse_recommendation_response(response_text: str, predicted_class: str, confidence: float) -> dict:
     """
     Parse response dari Gemma dan ekstrak ke struktur yang diinginkan.
-    
+
     Returns:
         dict dengan: intro, recommendations (list), sdgs (list), closing, low_confidence_warning
     """
     lines = response_text.strip().split('\n')
-    
+
     recommendations = []
-    sdgs = []
+    economic_value = []
     closing = ""
     intro = f"Wah selamat kamu sudah melakukan identifikasi sampah, sampah kamu adalah {predicted_class}! 🎉"
-    
+
     current_section = None
-    
+
     for line in lines:
         line = line.strip()
         if not line:
             continue
-        
-        # Deteksi section headers
-        if 'REKOMENDASI' in line.upper() and 'PENGOLAHAN' in line.upper():
+
+        upper_line = line.upper()
+
+        if 'REKOMENDASI' in upper_line and 'PENGELOLAAN' in upper_line:
             current_section = 'recommendations'
             continue
-        elif 'DAMPAK' in line.upper() and ('SDG' in line.upper() or 'SUSTAINABLE' in line.upper()):
-            current_section = 'sdgs'
+        elif 'KISARAN HARGA' in upper_line or 'POTENSI NILAI EKONOMIS' in upper_line:
+            current_section = 'economic_value'
             continue
-        elif 'PENUTUP' in line.upper():
+        elif 'PENGOLAHAN MANDIRI' in upper_line:
+            current_section = 'recommendations'
+            continue
+        elif 'PENUTUP' in upper_line:
             current_section = 'closing'
             continue
-        
-        # Parse items
-        if current_section == 'recommendations' and line and line[0].isdigit() and '.' in line[:3]:
-            # Extract numbered item (e.g., "1. Some text")
-            item = line.split('.', 1)[1].strip() if '.' in line else line
-            recommendations.append(item)
-        elif current_section == 'sdgs' and line and line[0].isdigit() and '.' in line[:3]:
-            # Extract SDG item
-            item = line.split('.', 1)[1].strip() if '.' in line else line
-            sdgs.append(item)
+
+        if line and (line[0].isdigit() and ('.' in line[:3] or ')' in line[:3])):
+            item = line.split('.', 1)[1].strip() if '.' in line else line.split(')', 1)[1].strip()
+            if current_section == 'recommendations':
+                recommendations.append(item)
+            elif current_section == 'economic_value':
+                economic_value.append(item)
         elif current_section == 'closing' and line:
             closing += line + " "
-    
+
     closing = closing.strip()
-    
-    # Generate low confidence warning jika perlu
+
     low_confidence_warning = ""
     if confidence < 0.8:
         low_confidence_warning = f"⚠️ Confidence prediksi hanya {confidence*100:.1f}%. Untuk hasil yang lebih akurat, silakan upload ulang gambar sampah dengan pencahayaan lebih jelas dan gambaran yang lebih detail. Terima kasih! 😊"
-    
+
     return {
         "intro": intro,
         "recommendations": recommendations,
-        "sdgs": sdgs,
+        "sdgs": economic_value,
         "closing": closing,
         "low_confidence_warning": low_confidence_warning
     }
@@ -489,7 +500,7 @@ def get_waste_recommendation(
     
     if formatted['sdgs']:
         html += "<div class='sdgs-section'>"
-        html += "<h4>Dampak SDGs:</h4>"
+        html += "<h4>Potensi Nilai Ekonomis:</h4>"
         html += "<ol class='sdgs-list'>"
         for sdg in formatted['sdgs']:
             html += f"<li>{sdg}</li>"

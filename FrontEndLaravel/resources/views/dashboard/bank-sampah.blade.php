@@ -371,6 +371,14 @@
             line-height: 1.55;
         }
 
+        .card-hours {
+            margin: 0.4rem 0 0.7rem;
+            color: #475467;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            font-weight: 700;
+        }
+
         .card-meta {
             display: flex;
             align-items: center;
@@ -712,6 +720,27 @@
             return 'status-unknown';
         }
 
+        function getTodayOperatingHours(bank) {
+            const operatingHours = Array.isArray(bank.operatingHours) ? bank.operatingHours : [];
+            if (!operatingHours.length) return 'Jam buka: tidak tersedia';
+
+            const dayNames = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+            const today = dayNames[new Date().getDay()];
+            const todaysHours = operatingHours.filter(item => String(item.day ?? '').toLowerCase() === today);
+
+            if (!todaysHours.length) return 'Jam buka: tidak tersedia';
+            if (todaysHours.some(item => item.is_unknown)) return 'Jam buka: tidak diketahui';
+            if (todaysHours.some(item => item.is_24_hours)) return 'Jam buka: 24 jam';
+            if (todaysHours.some(item => item.is_closed)) return 'Jam buka: tutup';
+
+            const segments = todaysHours
+                .filter(item => item.open_time && item.close_time)
+                .map(item => item.open_time + ' - ' + item.close_time);
+
+            if (segments.length) return 'Jam buka: ' + segments.join(', ');
+            return 'Jam buka: tidak tersedia';
+        }
+
         function normalizeBank(raw) {
             let operatingHours = raw.operating_hours ?? raw.operatingHours ?? [];
             if (operatingHours && !Array.isArray(operatingHours) && Array.isArray(operatingHours.data)) {
@@ -946,6 +975,7 @@
                         </div>
                     </div>
                     <div class="card-address">📍 ${escapeHtml(bank.address)}</div>
+                    <div class="card-hours">🕒 ${escapeHtml(getTodayOperatingHours(bank))}</div>
                     <div class="card-meta">
                         <span class="card-type">${escapeHtml(bank.waste_type)}</span>
                         <span class="card-distance">${distance !== null ? '📏 ' + formatDistance(distance) : ''}</span>
@@ -1144,12 +1174,9 @@
                 return;
             }
 
-            if (!userPosition) {
-                requestUserLocation();
-                return;
-            }
+            requestUserLocation();
 
-            if (map) {
+            if (map && userPosition) {
                 map.invalidateSize(false);
                 map.setView([userPosition.lat, userPosition.lng], 16, { animate: false });
             }
@@ -1161,8 +1188,9 @@
         initializeMap();
         loadBanks();
 
-        // Saat halaman pertama kali dibuka, langsung minta izin lokasi agar fitur
-        // jarak terdekat dan posisi user aktif sejak awal tanpa menunggu tombol map.
+        // Gunakan browser-native permission prompt. Ini akan muncul seperti permission
+        // yang biasa ditampilkan oleh situs web, bukan custom modal yang terlihat seperti
+        // overlay buatan. Browser sendiri yang menentukan apakah prompt muncul atau tidak.
         if ('geolocation' in navigator) {
             requestUserLocation();
         } else {

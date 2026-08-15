@@ -141,7 +141,7 @@
 
                     <div class="mt-6 rounded-[22px] border border-lime-200 bg-lime-50/80 p-4">
                         <h4 class="text-lg font-black text-slate-800">
-                            Recycling Recommendation
+                            Waste Education
                         </h4>
 
                         <div id="recommendations" class="mt-3 space-y-2 text-sm leading-relaxed text-slate-700">
