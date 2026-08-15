@@ -9,6 +9,7 @@ use App\Http\Controllers\EducationController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BankSampahController;
+use App\Http\Controllers\MarketplaceController;
 
 
 /*
@@ -111,6 +112,16 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/bank-sampah', [BankSampahController::class, 'index'])
         ->name('bank-sampah');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Marketplace
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/marketplace', [MarketplaceController::class, 'index'])
+        ->name('marketplace');
 
 
     /*
