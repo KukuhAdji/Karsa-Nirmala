@@ -69,6 +69,7 @@
         $isDashboard = request()->routeIs('dashboard');
         $isScanner = request()->routeIs(['scanner', 'scanner.history']);
         $isBankSampah = request()->routeIs('bank-sampah');
+        $isMarketplace = request()->routeIs('marketplace');
     @endphp
 
     <div class="p-4 sidebar-scroll overflow-y-auto min-h-[calc(100vh-7rem)]">
@@ -268,6 +269,50 @@
 
                 <span class="font-semibold">
                     GIS
+                </span>
+
+            </a>
+
+            <!-- ================================================= -->
+            <!-- MARKETPLACE -->
+            <!-- ================================================= -->
+
+            <a
+                href="{{ route('marketplace') }}"
+                class="flex items-center gap-3 p-3 rounded-2xl
+                       {{ $isMarketplace ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-lime-50 hover:text-lime-600' }}
+                       transition-colors duration-200"
+            >
+
+                <span
+                    class="w-10 h-10 rounded-2xl
+                           bg-slate-100
+                           flex items-center justify-center
+                           text-slate-600
+                           shrink-0"
+                >
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+
+                    </svg>
+
+                </span>
+
+                <span class="font-semibold">
+                    Marketplace
                 </span>
 
             </a>
