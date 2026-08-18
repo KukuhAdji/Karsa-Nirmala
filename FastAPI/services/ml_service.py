@@ -244,20 +244,106 @@ def load_artifacts():
     global _model, _class_names, _class_to_category
 
     if _model is None:
+        import hashlib
+        import keras
+        import PIL
+
+        print("=" * 70)
+        print("[ML] Starting model initialization")
+        print("=" * 70)
+
+        print(f"[ENV] Python     : {sys.version}")
+        print(f"[ENV] TensorFlow : {tf.__version__}")
+        print(f"[ENV] Keras      : {keras.__version__}")
+        print(f"[ENV] NumPy      : {np.__version__}")
+        print(f"[ENV] Pillow     : {PIL.__version__}")
+
+        print("-" * 70)
+        print(f"[ML] Model path  : {MODEL_PATH}")
+        print(f"[ML] Model exists: {MODEL_PATH.exists()}")
+
+        if not MODEL_PATH.exists():
+            raise FileNotFoundError(
+                f"Model tidak ditemukan di: {MODEL_PATH}"
+            )
+
+        sha256 = hashlib.sha256()
+
+        with open(MODEL_PATH, "rb") as model_file:
+            for chunk in iter(
+                lambda: model_file.read(1024 * 1024),
+                b""
+            ):
+                sha256.update(chunk)
+
+        print(f"[ML] Model SHA256: {sha256.hexdigest()}")
+
+        print("-" * 70)
+        print("[ML] Applying Keras compatibility patches")
+
         _patch_keras_compatibility()
+
+        print("[ML] Loading model using tf.keras.models.load_model()")
+
         try:
-            _model = tf.keras.models.load_model(MODEL_PATH, compile=False)
-        except Exception:
-            # try reconstructing model + weights from archive as a fallback
-            _model = _reconstruct_model_from_archive(MODEL_PATH)
+            _model = tf.keras.models.load_model(
+                MODEL_PATH,
+                compile=False
+            )
+
+            print("[ML] MODEL LOADED NATIVELY")
+            print(f"[ML] Input shape : {_model.input_shape}")
+            print(f"[ML] Output shape: {_model.output_shape}")
+            print(f"[ML] Total layers: {len(_model.layers)}")
+
+        except Exception as e:
+            print("=" * 70)
+            print("[ML] NATIVE MODEL LOAD FAILED")
+            print(f"[ML] Error type: {type(e).__name__}")
+            print(f"[ML] Error     : {repr(e)}")
+            print("=" * 70)
+
+            raise RuntimeError(
+                "Model gagal dimuat menggunakan "
+                "tf.keras.models.load_model(). "
+                f"Penyebab: {type(e).__name__}: {e}"
+            ) from e
 
     if _class_names is None:
+        print(f"[ML] Loading class names from: {CLASS_NAMES_PATH}")
+
         with open(CLASS_NAMES_PATH, "r", encoding="utf-8") as f:
             _class_names = json.load(f)
 
+        print(f"[ML] Number of classes: {len(_class_names)}")
+        print(f"[ML] Class names: {_class_names}")
+
+        if (
+            _model is not None
+            and _model.output_shape[-1] != len(_class_names)
+        ):
+            raise RuntimeError(
+                "Jumlah output model tidak sama dengan "
+                "jumlah class_names. "
+                f"Model output: {_model.output_shape[-1]}, "
+                f"class_names: {len(_class_names)}"
+            )
+
     if _class_to_category is None:
-        with open(CLASS_TO_CATEGORY_PATH, "r", encoding="utf-8") as f:
+        print(
+            f"[ML] Loading class-to-category mapping from: "
+            f"{CLASS_TO_CATEGORY_PATH}"
+        )
+
+        with open(
+            CLASS_TO_CATEGORY_PATH,
+            "r",
+            encoding="utf-8"
+        ) as f:
             _class_to_category = json.load(f)
+
+    print("[ML] All ML artifacts loaded successfully")
+    print("=" * 70)
 
     return _model, _class_names, _class_to_category
 
