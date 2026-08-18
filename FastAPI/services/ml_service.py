@@ -12,7 +12,7 @@ from PIL import Image
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
-MODEL_PATH = MODEL_DIR / "wise_mobilenetv2_final_rebuilt.keras"
+MODEL_PATH = MODEL_DIR / "wise_mobilenetv2_final_rebuilt.h5"
 CLASS_NAMES_PATH = MODEL_DIR / "class_names.json"
 CLASS_TO_CATEGORY_PATH = MODEL_DIR / "class_to_category.json"
 
