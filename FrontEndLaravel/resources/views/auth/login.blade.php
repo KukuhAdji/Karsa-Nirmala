@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#79d20a">
 
 <title>WISE Login</title>
 
@@ -109,9 +112,18 @@ Sign in to continue
 @if ($errors->any())
 
 <div class="mt-5 bg-red-100 border border-red-300 text-red-700 p-4 rounded-xl">
+    <p class="font-bold mb-2">❌ Login Gagal:</p>
+    @foreach ($errors->all() as $error)
+        <p class="text-sm">• {{ $error }}</p>
+    @endforeach
+</div>
 
-{{ $errors->first() }}
+@endif
 
+@if (session('success'))
+
+<div class="mt-5 bg-green-100 border border-green-300 text-green-700 p-4 rounded-xl">
+    ✅ {{ session('success') }}
 </div>
 
 @endif
@@ -119,6 +131,8 @@ Sign in to continue
 <form
 method="POST"
 action="{{ route('login.post') }}"
+x-data="{ submitting: false }"
+@submit="submitting = true"
 class="space-y-5 mt-8">
 
 @csrf
@@ -130,7 +144,8 @@ class="space-y-5 mt-8">
         value="{{ old('email') }}"
         placeholder="Email Address"
         required
-        class="w-full border rounded-2xl p-4 @error('email') border-red-500 @enderror"
+        :disabled="submitting"
+        class="w-full border rounded-2xl p-4 @error('email') border-red-500 @enderror disabled:opacity-50"
     >
     @error('email')
         <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
@@ -143,7 +158,8 @@ class="space-y-5 mt-8">
         name="password"
         placeholder="Password"
         required
-        class="w-full border rounded-2xl p-4"
+        :disabled="submitting"
+        class="w-full border rounded-2xl p-4 disabled:opacity-50"
     >
 </div>
 
@@ -153,7 +169,8 @@ class="space-y-5 mt-8">
 
 <input
 type="checkbox"
-name="remember">
+name="remember"
+:disabled="submitting">
 
 Remember Me
 
@@ -162,7 +179,8 @@ Remember Me
 <button
 type="button"
 @click="forgot=true"
-class="text-lime-600 font-bold">
+:disabled="submitting"
+class="text-lime-600 font-bold disabled:opacity-50">
 
 Forgot Password?
 
@@ -172,9 +190,11 @@ Forgot Password?
 
 <button
 type="submit"
-class="w-full bg-lime-500 hover:bg-lime-600 transition text-white py-4 rounded-2xl font-bold">
+:disabled="submitting"
+class="w-full bg-lime-500 hover:bg-lime-600 disabled:bg-slate-400 disabled:cursor-not-allowed transition text-white py-4 rounded-2xl font-bold">
 
-Login
+<span x-show="!submitting">Login</span>
+<span x-show="submitting">Logging in...</span>
 
 </button>
 
@@ -235,6 +255,8 @@ Create Account
 <form
 method="POST"
 action="{{ route('register.post') }}"
+x-data="{ submitting: false }"
+@submit="submitting = true"
 class="space-y-4">
 
 @csrf
@@ -246,7 +268,8 @@ class="space-y-4">
         value="{{ old('name') }}"
         placeholder="Full Name"
         required
-        class="w-full border rounded-xl p-4 @error('name') border-red-500 @enderror"
+        :disabled="submitting"
+        class="w-full border rounded-xl p-4 @error('name') border-red-500 @enderror disabled:opacity-50"
     >
     @error('name')
         <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
@@ -260,7 +283,8 @@ class="space-y-4">
         value="{{ old('email') }}"
         placeholder="Email Address"
         required
-        class="w-full border rounded-xl p-4 @error('email') border-red-500 @enderror"
+        :disabled="submitting"
+        class="w-full border rounded-xl p-4 @error('email') border-red-500 @enderror disabled:opacity-50"
     >
     @error('email')
         <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
@@ -273,7 +297,8 @@ class="space-y-4">
         name="password"
         placeholder="Password (min 6 karakter)"
         required
-        class="w-full border rounded-xl p-4 @error('password') border-red-500 @enderror"
+        :disabled="submitting"
+        class="w-full border rounded-xl p-4 @error('password') border-red-500 @enderror disabled:opacity-50"
     >
     @error('password')
         <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
@@ -286,15 +311,18 @@ class="space-y-4">
         name="password_confirmation"
         placeholder="Confirm Password"
         required
-        class="w-full border rounded-xl p-4"
+        :disabled="submitting"
+        class="w-full border rounded-xl p-4 disabled:opacity-50"
     >
 </div>
 
 <button
 type="submit"
-class="w-full bg-lime-500 hover:bg-lime-600 text-white py-4 rounded-xl font-bold transition">
+:disabled="submitting"
+class="w-full bg-lime-500 hover:bg-lime-600 disabled:bg-slate-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold transition">
 
-Register
+<span x-show="!submitting">Register</span>
+<span x-show="submitting">Registering...</span>
 
 </button>
 
