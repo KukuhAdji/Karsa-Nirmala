@@ -20,6 +20,10 @@ body{
     font-family:'Nunito',sans-serif;
 }
 
+[x-cloak] {
+    display: none !important;
+}
+
 </style>
 
 </head>
@@ -27,9 +31,10 @@ body{
 
 <div
 x-data="{
-register:false,
+register: {{ request()->route()->getName() === 'register' || old('email') && $errors->any() ? 'true' : 'false' }},
 forgot:false
 }"
+x-cloak
 class="min-h-screen bg-gradient-to-br from-lime-50 via-white to-green-100">
 
 <div class="max-w-7xl mx-auto px-6 min-h-screen">
@@ -118,20 +123,29 @@ class="space-y-5 mt-8">
 
 @csrf
 
-<input
-type="email"
-name="email"
-value="{{ old('email') }}"
-placeholder="Email Address"
-required
-class="w-full border rounded-2xl p-4">
+<div>
+    <input
+        type="email"
+        name="email"
+        value="{{ old('email') }}"
+        placeholder="Email Address"
+        required
+        class="w-full border rounded-2xl p-4 @error('email') border-red-500 @enderror"
+    >
+    @error('email')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
 
-<input
-type="password"
-name="password"
-placeholder="Password"
-required
-class="w-full border rounded-2xl p-4">
+<div>
+    <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        required
+        class="w-full border rounded-2xl p-4"
+    >
+</div>
 
 <div class="flex justify-between text-sm">
 
@@ -201,50 +215,84 @@ class="fixed inset-0 bg-black/60 flex items-center justify-center p-6 z-50">
 
 <div
 @click.away="register=false"
-class="bg-white rounded-[32px] p-8 w-full max-w-lg">
+class="bg-white rounded-[32px] p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto">
 
 <h3 class="text-3xl font-black mb-6">
 Create Account
 </h3>
 
+@if ($errors->any())
+<div class="mb-6 bg-red-100 border border-red-300 text-red-700 p-4 rounded-xl">
+    <p class="font-bold mb-2">Gagal membuat akun:</p>
+    <ul class="list-disc list-inside text-sm">
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
 <form
 method="POST"
-action="{{ route('register') }}"
+action="{{ route('register.post') }}"
 class="space-y-4">
 
 @csrf
 
-<input
-type="text"
-name="name"
-placeholder="Full Name"
-required
-class="w-full border rounded-xl p-4">
+<div>
+    <input
+        type="text"
+        name="name"
+        value="{{ old('name') }}"
+        placeholder="Full Name"
+        required
+        class="w-full border rounded-xl p-4 @error('name') border-red-500 @enderror"
+    >
+    @error('name')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
 
-<input
-type="email"
-name="email"
-placeholder="Email Address"
-required
-class="w-full border rounded-xl p-4">
+<div>
+    <input
+        type="email"
+        name="email"
+        value="{{ old('email') }}"
+        placeholder="Email Address"
+        required
+        class="w-full border rounded-xl p-4 @error('email') border-red-500 @enderror"
+    >
+    @error('email')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
 
-<input
-type="password"
-name="password"
-placeholder="Password"
-required
-class="w-full border rounded-xl p-4">
+<div>
+    <input
+        type="password"
+        name="password"
+        placeholder="Password (min 6 karakter)"
+        required
+        class="w-full border rounded-xl p-4 @error('password') border-red-500 @enderror"
+    >
+    @error('password')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+</div>
 
-<input
-type="password"
-name="password_confirmation"
-placeholder="Confirm Password"
-required
-class="w-full border rounded-xl p-4">
+<div>
+    <input
+        type="password"
+        name="password_confirmation"
+        placeholder="Confirm Password"
+        required
+        class="w-full border rounded-xl p-4"
+    >
+</div>
 
 <button
 type="submit"
-class="w-full bg-lime-500 text-white py-4 rounded-xl font-bold">
+class="w-full bg-lime-500 hover:bg-lime-600 text-white py-4 rounded-xl font-bold transition">
 
 Register
 
@@ -254,7 +302,7 @@ Register
 
 <button
 @click="register=false"
-class="w-full mt-4 text-slate-500">
+class="w-full mt-4 text-slate-500 hover:text-slate-700">
 
 Close
 
