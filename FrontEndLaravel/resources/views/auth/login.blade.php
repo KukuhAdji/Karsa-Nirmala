@@ -144,7 +144,6 @@ class="space-y-5 mt-8">
         value="{{ old('email') }}"
         placeholder="Email Address"
         required
-        :disabled="submitting"
         class="w-full border rounded-2xl p-4 @error('email') border-red-500 @enderror disabled:opacity-50"
     >
     @error('email')
@@ -158,7 +157,6 @@ class="space-y-5 mt-8">
         name="password"
         placeholder="Password"
         required
-        :disabled="submitting"
         class="w-full border rounded-2xl p-4 disabled:opacity-50"
     >
 </div>
@@ -268,7 +266,6 @@ class="space-y-4">
         value="{{ old('name') }}"
         placeholder="Full Name"
         required
-        :disabled="submitting"
         class="w-full border rounded-xl p-4 @error('name') border-red-500 @enderror disabled:opacity-50"
     >
     @error('name')
@@ -283,7 +280,6 @@ class="space-y-4">
         value="{{ old('email') }}"
         placeholder="Email Address"
         required
-        :disabled="submitting"
         class="w-full border rounded-xl p-4 @error('email') border-red-500 @enderror disabled:opacity-50"
     >
     @error('email')
@@ -297,7 +293,6 @@ class="space-y-4">
         name="password"
         placeholder="Password (min 6 karakter)"
         required
-        :disabled="submitting"
         class="w-full border rounded-xl p-4 @error('password') border-red-500 @enderror disabled:opacity-50"
     >
     @error('password')
@@ -311,7 +306,6 @@ class="space-y-4">
         name="password_confirmation"
         placeholder="Confirm Password"
         required
-        :disabled="submitting"
         class="w-full border rounded-xl p-4 disabled:opacity-50"
     >
 </div>
