@@ -10,6 +10,8 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BankSampahController;
 use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\AdminBankSampahController;
+use App\Http\Controllers\AdminMarketplaceController;
 
 
 /*
@@ -52,10 +54,28 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
+    Route::middleware('bank-sampah-admin')
+        ->prefix('admin/bank-sampah')
+        ->name('admin.bank-sampah.')
+        ->group(function () {
+            Route::get('/', [AdminBankSampahController::class, 'index'])
+                ->name('dashboard');
+            Route::put('/', [AdminBankSampahController::class, 'update'])
+                ->name('update');
+            Route::get('/katalog', [AdminMarketplaceController::class, 'index'])
+                ->name('catalog.index');
+            Route::post('/katalog', [AdminMarketplaceController::class, 'store'])
+                ->name('catalog.store');
+            Route::put('/katalog/{product}', [AdminMarketplaceController::class, 'update'])
+                ->name('catalog.update');
+            Route::delete('/katalog/{product}', [AdminMarketplaceController::class, 'destroy'])
+                ->name('catalog.destroy');
+        });
 
 
     /*
@@ -125,6 +145,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/marketplace', [MarketplaceController::class, 'index'])
         ->name('marketplace');
+    Route::get('/marketplace/produk/{product}', [MarketplaceController::class, 'show'])
+        ->name('marketplace.product');
+    Route::post('/marketplace/produk/{product}/beli', [MarketplaceController::class, 'buy'])
+        ->name('marketplace.product.buy');
 
 
     /*

@@ -70,6 +70,8 @@
         $isScanner = request()->routeIs(['scanner', 'scanner.history']);
         $isBankSampah = request()->routeIs('bank-sampah');
         $isMarketplace = request()->routeIs('marketplace');
+        $isMarketplaceCatalog = request()->routeIs('admin.bank-sampah.catalog.*');
+        $isBankSampahAdmin = auth()->user()?->role === 'admin_bank_sampah';
     @endphp
 
     <div class="p-4 sidebar-scroll overflow-y-auto min-h-[calc(100vh-7rem)]">
@@ -81,11 +83,38 @@
 
 
         <nav class="space-y-2">
+            @if ($isBankSampahAdmin)
+                <a href="{{ route('admin.bank-sampah.dashboard') }}"
+                    class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 transition-colors duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm">⚙</span>
+                    <span class="font-semibold">Kelola Bank Sampah</span>
+                </a>
+                <a href="{{ route('admin.bank-sampah.catalog.index') }}"
+                    class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 transition-colors duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm">🛒</span>
+                    <span class="font-semibold">Kelola Marketplace</span>
+                </a>
+                <a href="{{ route('chatbot') }}"
+                    class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 transition-colors duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm">💬</span>
+                    <span class="font-semibold">AI Chatbot</span>
+                </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-left text-slate-700 transition-colors duration-200 hover:border-red-200 hover:bg-red-50 hover:text-red-600">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-red-500 shadow-sm">↪</span>
+                        <span class="font-semibold">Logout</span>
+                    </button>
+                </form>
+            @endif
 
+            @unless ($isBankSampahAdmin)
             <!-- ================================================= -->
             <!-- DASHBOARD -->
             <!-- ================================================= -->
 
+            @if (!$isBankSampahAdmin)
             <a
                 href="{{ route('dashboard') }}"
                 class="flex items-center gap-3 p-3 rounded-2xl
@@ -124,6 +153,7 @@
                 </span>
 
             </a>
+            @endif
 
 
             <!-- ================================================= -->
@@ -227,7 +257,9 @@
 
             </a>
 
+            @endunless
 
+            @if (!$isBankSampahAdmin)
             <!-- ================================================= -->
             <!-- GIS -->
             <!-- ================================================= -->
@@ -316,6 +348,7 @@
                 </span>
 
             </a>
+            @endif
 
             <!-- ================================================= -->
             <!-- AI CHATBOT -->
@@ -362,7 +395,7 @@
 
             </a>
 
-
+            @unless ($isBankSampahAdmin)
             <!-- ================================================= -->
             <!-- PROFILE -->
             <!-- ================================================= -->
@@ -478,6 +511,7 @@
                 </button>
 
             </form>
+            @endunless
 
         </nav>
 

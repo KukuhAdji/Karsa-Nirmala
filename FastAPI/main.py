@@ -1,16 +1,6 @@
-from pathlib import Path
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-BASE_DIR = Path(__file__).resolve().parent
-DOTENV_PATHS = [
-    BASE_DIR / '.env',
-    BASE_DIR.parent / 'FrontEndLaravel' / '.env'
-]
-for dotenv_path in DOTENV_PATHS:
-    if dotenv_path.exists():
-        load_dotenv(dotenv_path)
+from config import OPENROUTER_API_KEY, OPENROUTER_MODEL, OPENROUTER_TIMEOUT_SECONDS
 
 from routers.predict_router import router as predict_router
 from routers.chat_router import router as chat_router
@@ -41,5 +31,10 @@ def health():
     return {
         'status': 'healthy',
         'predict_route': '/predict',
-        'chat_route': '/chat'
+        'chat_route': '/chat',
+        'openrouter': {
+            'configured': bool(OPENROUTER_API_KEY),
+            'model': OPENROUTER_MODEL,
+            'timeout_seconds': OPENROUTER_TIMEOUT_SECONDS,
+        }
     }

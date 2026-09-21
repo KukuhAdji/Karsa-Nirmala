@@ -1,10 +1,7 @@
-import os
 import requests
 from typing import Optional
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemma-2-9b-it:free")
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+from config import OPENROUTER_API_KEY, OPENROUTER_MODEL, OPENROUTER_TIMEOUT_SECONDS, OPENROUTER_URL, openrouter_headers
 
 
 def build_prompt(message: str, predicted_class: Optional[str], category: Optional[str], confidence: Optional[float]) -> str:
@@ -44,12 +41,7 @@ def chat_with_gemma(message: str, predicted_class: Optional[str] = None, categor
 
     prompt = build_prompt(message, predicted_class, category, confidence)
 
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost",
-        "X-Title": "WISE API",
-    }
+    headers = openrouter_headers()
 
     payload = {
         "model": OPENROUTER_MODEL,
@@ -60,7 +52,7 @@ def chat_with_gemma(message: str, predicted_class: Optional[str] = None, categor
         "temperature": 0.4
     }
 
-    response = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=60)
+    response = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=(10, OPENROUTER_TIMEOUT_SECONDS))
     response.raise_for_status()
 
     data = response.json()

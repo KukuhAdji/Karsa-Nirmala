@@ -123,6 +123,27 @@
                         </p>
                     </div>
 
+                    <div id="nearbyBanksSection" class="mt-6 hidden rounded-[22px] border border-emerald-100 bg-emerald-50/80 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h4 class="text-lg font-black text-slate-800">
+                                    Bank Sampah Terdekat
+                                </h4>
+                                <p id="nearbyBanksStatus" class="mt-1 text-xs text-slate-500">
+                                    Mencari lokasi bank sampah...
+                                </p>
+                            </div>
+                            <button
+                                id="nearbyBanksRetry"
+                                type="button"
+                                class="hidden rounded-[12px] bg-white px-3 py-2 text-xs font-bold text-emerald-700 shadow-sm ring-1 ring-emerald-100 transition hover:bg-emerald-100">
+                                Coba lagi
+                            </button>
+                        </div>
+
+                        <div id="nearbyBanksList" class="mt-3 space-y-2"></div>
+                    </div>
+
                     <div id="youtubeSection" class="mt-6 hidden rounded-[22px] border border-red-100 bg-red-50 p-4">
                         <h4 class="text-lg font-black text-slate-800">
                             Tutorial Pengolahan Sampah
@@ -188,9 +209,15 @@ const confidenceBar = document.getElementById('confidenceBar');
 const confidenceValue = document.getElementById('confidenceValue');
 const recommendations = document.getElementById('recommendations');
 const scanProgress = document.getElementById('scanProgress');
+const nearbyBanksSection = document.getElementById('nearbyBanksSection');
+const nearbyBanksStatus = document.getElementById('nearbyBanksStatus');
+const nearbyBanksList = document.getElementById('nearbyBanksList');
+const nearbyBanksRetry = document.getElementById('nearbyBanksRetry');
+const BANKS_ENDPOINT = "{{ url('/api/bank-sampah') }}";
 
 let cameraStream = null;
 let currentImageFile = null;
+let currentUserLocation = null;
 let currentCategoryKey = null;
 let currentPredictedClass = null;
 let currentRecommendations = [
@@ -259,6 +286,137 @@ function getRecommendations(category, predictedClass) {
     const baseRecommendations = categoryRecommendations[categoryKey] || categoryRecommendations.anorganik;
     const extra = predictedClass ? [`Pastikan ${getReadableLabel(predictedClass)} dibuang dengan benar sesuai kategori.`] : [];
     return [...extra, ...baseRecommendations];
+}
+
+function formatDistance(distanceKm) {
+    if (distanceKm < 1) {
+        return `${Math.round(distanceKm * 1000)} m`;
+    }
+
+    return `${distanceKm.toFixed(1)} km`;
+}
+
+function calculateDistanceKm(latitude1, longitude1, latitude2, longitude2) {
+    const earthRadiusKm = 6371;
+    const latitudeDelta = (latitude2 - latitude1) * Math.PI / 180;
+    const longitudeDelta = (longitude2 - longitude1) * Math.PI / 180;
+    const latitude1Radians = latitude1 * Math.PI / 180;
+    const latitude2Radians = latitude2 * Math.PI / 180;
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+        + Math.sin(longitudeDelta / 2) ** 2
+        * Math.cos(latitude1Radians)
+        * Math.cos(latitude2Radians);
+
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+}
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function renderNearbyBanks(banks, userLatitude, userLongitude) {
+    const nearestBanks = banks
+        .map(bank => ({
+            ...bank,
+            distanceKm: calculateDistanceKm(
+                userLatitude,
+                userLongitude,
+                Number(bank.latitude),
+                Number(bank.longitude)
+            )
+        }))
+        .filter(bank => Number.isFinite(bank.distanceKm))
+        .sort((first, second) => first.distanceKm - second.distanceKm)
+        .slice(0, 3);
+
+    if (!nearestBanks.length) {
+        nearbyBanksStatus.textContent = 'Belum ada data bank sampah dengan koordinat valid.';
+        nearbyBanksList.innerHTML = '';
+        return;
+    }
+
+    nearbyBanksStatus.textContent = 'Diurutkan berdasarkan jarak dari lokasi kamu.';
+    nearbyBanksList.innerHTML = nearestBanks.map((bank, index) => {
+        const name = escapeHtml(bank.name || 'Bank Sampah');
+        const address = escapeHtml(bank.address || 'Alamat belum tersedia');
+        const distance = formatDistance(bank.distanceKm);
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${bank.latitude},${bank.longitude}`)}`;
+
+        return `
+            <div class="rounded-[16px] bg-white p-3 shadow-sm ring-1 ring-emerald-100">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="font-bold text-slate-800">${index + 1}. ${name}</p>
+                        <p class="mt-1 text-xs leading-relaxed text-slate-500">${address}</p>
+                    </div>
+                    <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700">
+                        ${distance}
+                    </span>
+                </div>
+                <a
+                    href="${mapsUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-2 inline-flex text-xs font-bold text-emerald-700 hover:text-emerald-900">
+                    Buka rute di Google Maps →
+                </a>
+            </div>
+        `;
+    }).join('');
+}
+
+async function loadNearbyBanks() {
+    nearbyBanksSection.classList.remove('hidden');
+    nearbyBanksRetry.classList.add('hidden');
+    nearbyBanksStatus.textContent = 'Meminta izin lokasi...';
+    nearbyBanksList.innerHTML = '';
+
+    if (!navigator.geolocation) {
+        nearbyBanksStatus.textContent = 'Browser ini tidak mendukung akses lokasi.';
+        nearbyBanksRetry.classList.remove('hidden');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async position => {
+        const userLatitude = Number(position.coords.latitude);
+        const userLongitude = Number(position.coords.longitude);
+        currentUserLocation = { latitude: userLatitude, longitude: userLongitude };
+
+        try {
+            nearbyBanksStatus.textContent = 'Mengambil data bank sampah...';
+            const response = await fetch(BANKS_ENDPOINT, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+
+            if (!response.ok || !result.success || !Array.isArray(result.data)) {
+                throw new Error(result.message || 'Data bank sampah tidak tersedia.');
+            }
+
+            renderNearbyBanks(result.data, userLatitude, userLongitude);
+        } catch (error) {
+            nearbyBanksStatus.textContent = error.message || 'Gagal mengambil data bank sampah.';
+            nearbyBanksRetry.classList.remove('hidden');
+            console.error(error);
+        }
+    }, error => {
+        const messages = {
+            1: 'Izin lokasi ditolak. Aktifkan lokasi untuk melihat bank sampah terdekat.',
+            2: 'Lokasi tidak dapat ditemukan. Pastikan GPS atau jaringan aktif.',
+            3: 'Permintaan lokasi habis waktu. Silakan coba lagi.'
+        };
+        nearbyBanksStatus.textContent = messages[error.code] || 'Lokasi tidak dapat diakses.';
+        nearbyBanksRetry.classList.remove('hidden');
+    }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+    });
 }
 
 function updateYoutubeTutorial(category) {
@@ -476,6 +634,7 @@ async function classifyImage(file) {
         updateResult(classLabel, categoryKey, confidencePercent, recommendationsText);
         resultCategoryType.textContent = `Prediksi selesai: ${categoryLabel}`;
         currentImageFile = file;
+        loadNearbyBanks();
     } catch (error) {
         scanProgress.style.width = '100%';
         resultCategory.textContent = 'Scan failed';
@@ -488,6 +647,7 @@ async function classifyImage(file) {
 
 startCameraBtn?.addEventListener('click', startCamera);
 stopCameraBtn?.addEventListener('click', stopCamera);
+nearbyBanksRetry?.addEventListener('click', loadNearbyBanks);
 
 captureBtn?.addEventListener('click', () => {
     if (!cameraStream) {

@@ -1,29 +1,13 @@
-import os
-from pathlib import Path
-from dotenv import load_dotenv
 import requests
 from typing import Optional
 import time
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-DOTENV_PATHS = [
-    BASE_DIR / '.env',
-    BASE_DIR / 'Frontend' / '.env'
-]
-for dotenv_path in DOTENV_PATHS:
-    if dotenv_path.exists():
-        load_dotenv(dotenv_path)
-
-OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
-print("=" * 50)
-print("OPENROUTER_API_KEY =", OPENROUTER_API_KEY)
-print("=" * 50)
-OPENROUTER_MODEL = os.getenv(
-    "OPENROUTER_MODEL",
-    "google/gemma-4-31b-it:free"
+from config import (
+    OPENROUTER_API_KEY,
+    OPENROUTER_MODEL,
+    OPENROUTER_TIMEOUT_SECONDS,
+    OPENROUTER_URL,
+    openrouter_headers,
 )
-print("MODEL =", OPENROUTER_MODEL)
-OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
 # Cache untuk mengurangi API calls
 _response_cache = {}
@@ -125,21 +109,16 @@ def chat_with_gemma(
 
     prompt = build_prompt(message, predicted_class, category, confidence)
 
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost",
-        "X-Title": "WISE API"
-    }
+    headers = openrouter_headers()
 
     payload = {
         "model": OPENROUTER_MODEL,
         "messages": [
             {
                 "role": "system",
-                "content": """Kamu adalah Peri Nirmala, asisten edukasi lingkungan yang ramah dan peka terhadap pengelolaan sampah. 
-Kamu bicara natural, warm, dan mendorong orang untuk ikut menjaga lingkungan dengan cara yang mudah dipahami. 
-Fokus utamamu adalah edukasi tentang pengolahan sampah, cara memilah sampah, manfaat daur ulang, serta nilai ekonomis sampah jika dijual ke pengepul atau bank sampah. 
+                "content": """Kamu adalah Peri Nirmala, asisten edukasi lingkungan yang ramah dan peka terhadap pengelolaan sampah.
+Kamu bicara natural, warm, dan mendorong orang untuk ikut menjaga lingkungan dengan cara yang mudah dipahami.
+Fokus utamamu adalah edukasi tentang pengolahan sampah, cara memilah sampah, manfaat daur ulang, serta nilai ekonomis sampah jika dijual ke pengepul atau bank sampah.
 Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji secukupnya agar terasa menyenangkan. 💚♻️💰"""
             },
             {
@@ -148,27 +127,27 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
             }
         ],
         "temperature": 0.7,
-        "top_p": 0.9
+        "top_p": 0.9,
+        "max_tokens": 500,
     }
 
     # Retry logic untuk handle rate limit
     max_retries = 3
     retry_delay = 2  # detik
-    
+
     for attempt in range(max_retries):
         try:
             response = requests.post(
                 OPENROUTER_URL,
                 headers=headers,
                 json=payload,
-                timeout=60
+                timeout=(10, OPENROUTER_TIMEOUT_SECONDS)
             )
             print("\n" + "=" * 60)
             print("REQUEST KE OPENROUTER")
             print("MODEL :", OPENROUTER_MODEL)
             print("STATUS:", response.status_code)
-            print("BODY:")
-            print(response.text)
+            print("BODY PREVIEW:", response.text[:500])
             print("=" * 60 + "\n")
 
             # Jika success
@@ -198,7 +177,12 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
                 return f"❌ Terjadi error: {error_detail}"
 
         except requests.exceptions.Timeout:
-            return "⏱️ Request timeout. Coba lagi ya 😊"
+            return _build_local_chat_fallback(
+                message,
+                predicted_class,
+                category,
+                "ℹ️ Layanan AI sedang lambat, jadi Peri Nirmala memberikan panduan lokal terlebih dahulu.",
+            )
 
         except requests.exceptions.ConnectionError:
             return "🌐 Koneksi error. Pastikan internet kamu stabil ya 💚"
@@ -208,6 +192,38 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
             return f"⚠️ Terjadi kesalahan: {e}"
 
     return "⏱️ Gagal setelah beberapa kali percobaan. Coba lagi nanti 😊"
+
+
+def _build_local_chat_fallback(
+    message: str,
+    predicted_class: Optional[str],
+    category: Optional[str],
+    reason: str,
+) -> str:
+    readable_class = (
+        predicted_class.replace("_", " ").title()
+        if predicted_class
+        else "sampah yang kamu tanyakan"
+    )
+    waste_info = WASTE_CLASS_INFO.get((predicted_class or "").lower(), {})
+    handling = waste_info.get(
+        "handling",
+        "Pisahkan sampah berdasarkan jenisnya, pastikan tetap kering, lalu setorkan ke bank sampah atau pengepul yang sesuai.",
+    )
+    economic_value = waste_info.get(
+        "economic_value",
+        "Nilai jual bergantung pada jenis, kebersihan, jumlah, dan harga yang berlaku di bank sampah atau pengepul setempat.",
+    )
+
+    return (
+        f"{reason}\n\n"
+        f"Untuk {readable_class}, langkah yang disarankan:\n"
+        f"1. {handling}\n"
+        "2. Jangan mencampurnya dengan sampah basah atau limbah berbahaya.\n"
+        "3. Simpan dalam kondisi bersih dan kering sebelum disetorkan.\n\n"
+        f"Perkiraan nilai ekonomis: {economic_value}\n\n"
+        "Pertanyaanmu sudah diterima. Coba lagi beberapa saat nanti jika ingin mendapatkan jawaban AI yang lebih spesifik. ♻️"
+    )
 
 
 def build_recommendation_prompt(
@@ -273,6 +289,43 @@ PANDUAN PENULISAN:
 JANGAN TAMBAHKAN APAPUN SELAIN FORMAT DI ATAS - tidak ada intro, tidak ada kalimat tambahan di awal atau akhir!""".strip()
 
 
+def _build_local_fallback_recommendation(
+    predicted_class: str,
+    confidence: float,
+    reason: str,
+) -> dict:
+    waste_info = WASTE_CLASS_INFO.get(predicted_class.lower(), {})
+    handling = waste_info.get(
+        "handling",
+        "Pisahkan dari sampah lain, bersihkan bila aman, dan simpan dalam kondisi kering.",
+    )
+    economic_value = waste_info.get(
+        "economic_value",
+        "Nilai ekonomis bergantung pada kebersihan, berat, dan harga setempat.",
+    )
+    readable_class = predicted_class.replace("_", " ").title()
+
+    return {
+        "intro": (
+            f"Wah, sampah kamu teridentifikasi sebagai {readable_class}! "
+            "Berikut panduan pengelolaan dasarnya."
+        ),
+        "recommendations": [
+            handling,
+            "Pisahkan dari sampah basah atau berbahaya, lalu bersihkan dan keringkan jika aman dilakukan.",
+            "Simpan dalam wadah tertutup dan setorkan ke bank sampah atau pengepul yang menerima jenis ini.",
+        ],
+        "sdgs": [economic_value],
+        "closing": reason,
+        "low_confidence_warning": (
+            f"Confidence prediksi {confidence * 100:.1f}%. "
+            "Pastikan foto berikutnya cukup terang dan objek terlihat jelas."
+            if confidence < 0.8
+            else ""
+        ),
+    }
+
+
 def get_formatted_waste_recommendation(
     predicted_class: str,
     category: str,
@@ -280,7 +333,7 @@ def get_formatted_waste_recommendation(
 ) -> dict:
     """
     Menghasilkan rekomendasi pengolahan sampah terformat dengan struktur rapi.
-    
+
     Returns:
         dict dengan keys: intro, recommendations, sdgs, closing, low_confidence_warning
     """
@@ -292,24 +345,19 @@ def get_formatted_waste_recommendation(
             "closing": "⚠️ API key tidak tersedia.",
             "low_confidence_warning": ""
         }
-    
+
     readable_class = predicted_class.replace('_', ' ').title()
-    
+
     # Generate cache key
     cache_key = f"formatted_recommendation_{predicted_class}_{category}".lower()
     if cache_key in _response_cache:
         print(f"Using cached formatted recommendation for: {predicted_class}")
         return _response_cache[cache_key]
-    
+
     prompt = build_recommendation_prompt(predicted_class, category, confidence)
-    
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost",
-        "X-Title": "WISE API"
-    }
-    
+
+    headers = openrouter_headers()
+
     payload = {
         "model": OPENROUTER_MODEL,
         "messages": [
@@ -323,27 +371,33 @@ def get_formatted_waste_recommendation(
             }
         ],
         "temperature": 0.6,
-        "top_p": 0.8
+        "top_p": 0.8,
+        "max_tokens": 700,
     }
-    
+
     max_retries = 3
     retry_delay = 2
-    
+
     for attempt in range(max_retries):
         try:
-            response = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=60)
-            
+            response = requests.post(
+                OPENROUTER_URL,
+                headers=headers,
+                json=payload,
+                timeout=(10, OPENROUTER_TIMEOUT_SECONDS),
+            )
+
             if response.status_code == 200:
                 data = response.json()
                 raw_response = data["choices"][0]["message"]["content"]
-                
+
                 # Parse response ke struktur yang diinginkan
                 formatted_result = _parse_recommendation_response(raw_response, readable_class, confidence)
-                
+
                 # Cache the response
                 _response_cache[cache_key] = formatted_result
                 return formatted_result
-            
+
             elif response.status_code == 429:
                 if attempt < max_retries - 1:
                     wait_time = retry_delay * (2 ** attempt)
@@ -358,7 +412,7 @@ def get_formatted_waste_recommendation(
                         "closing": "⏱️ Server sedang sibuk. Coba lagi dalam beberapa saat ya 😊",
                         "low_confidence_warning": ""
                     }
-            
+
             else:
                 try:
                     error_detail = response.json().get('error', {}).get('message', 'Unknown error')
@@ -371,15 +425,17 @@ def get_formatted_waste_recommendation(
                     "closing": f"❌ Error: {error_detail}",
                     "low_confidence_warning": ""
                 }
-        
+
         except requests.exceptions.Timeout:
-            return {
-                "intro": "",
-                "recommendations": [],
-                "sdgs": [],
-                "closing": "⏱️ Request timeout. Coba lagi ya 😊",
-                "low_confidence_warning": ""
-            }
+            print(
+                f"OpenRouter recommendation timed out after "
+                f"{OPENROUTER_TIMEOUT_SECONDS:g} seconds for {predicted_class}"
+            )
+            return _build_local_fallback_recommendation(
+                predicted_class,
+                confidence,
+                "ℹ️ Rekomendasi AI sedang lambat. Panduan dasar di atas tetap dapat digunakan.",
+            )
         except requests.exceptions.ConnectionError:
             return {
                 "intro": "",
@@ -397,7 +453,7 @@ def get_formatted_waste_recommendation(
                 "closing": f"⚠️ Terjadi kesalahan: {str(e)}",
                 "low_confidence_warning": ""
             }
-    
+
     return {
         "intro": "",
         "recommendations": [],
@@ -474,22 +530,22 @@ def get_waste_recommendation(
 ) -> str:
     """
     Menghasilkan rekomendasi pengolahan sampah spesifik menggunakan Gemma AI (legacy function).
-    
+
     Args:
         predicted_class: Jenis sampah yang terdeteksi (e.g., 'botol_plastik')
         category: Kategori utama (e.g., 'Anorganik')
         confidence: Confidence score dari model (0-1)
-    
+
     Returns:
         String berisi rekomendasi pengolahan dari Gemma
     """
     # Gunakan function baru dan format ke HTML string
     formatted = get_formatted_waste_recommendation(predicted_class, category, confidence)
-    
+
     html = f"""<div class='recommendations-container'>
         <p class='intro-text'>{formatted['intro']}</p>
     """
-    
+
     if formatted['recommendations']:
         html += "<div class='recommendations-section'>"
         html += "<h4>Rekomendasi Pengolahan untuk sampah {0}:</h4>".format(predicted_class.replace('_', ' ').title())
@@ -497,7 +553,7 @@ def get_waste_recommendation(
         for rec in formatted['recommendations']:
             html += f"<li>{rec}</li>"
         html += "</ol></div>"
-    
+
     if formatted['sdgs']:
         html += "<div class='sdgs-section'>"
         html += "<h4>Potensi Nilai Ekonomis:</h4>"
@@ -505,15 +561,15 @@ def get_waste_recommendation(
         for sdg in formatted['sdgs']:
             html += f"<li>{sdg}</li>"
         html += "</ol></div>"
-    
+
     if formatted['closing']:
         html += f"<p class='closing-text'>{formatted['closing']}</p>"
-    
+
     if formatted['low_confidence_warning']:
         html += f"<div class='warning-box'><p>{formatted['low_confidence_warning']}</p></div>"
-    
+
     html += "</div>"
-    
+
     return html
 
 
@@ -546,20 +602,20 @@ def get_youtube_recommendation(
 ) -> dict:
     """
     Get YouTube tutorial link untuk sampah tertentu.
-    
+
     SIMPLE VERSION: Hanya ambil dari YOUTUBE_FALLBACK (hardcoded links).
     User dapat mengedit links langsung di YOUTUBE_FALLBACK dictionary.
-    
+
     Args:
         predicted_class: Jenis sampah (e.g., 'botol_plastik')
         category: Kategori sampah (e.g., 'Anorganik')
-    
+
     Returns:
         dict dengan keys: title, url
     """
-    
+
     predicted_class_lower = predicted_class.lower()
-    
+
     # Jika ada di YOUTUBE_FALLBACK, return langsung
     if predicted_class_lower in YOUTUBE_FALLBACK:
         link = YOUTUBE_FALLBACK[predicted_class_lower]
@@ -571,12 +627,10 @@ def get_youtube_recommendation(
                 "url": "#"
             }
         return link
-    
+
     # Jika tidak ada di dictionary
     print(f"⚠️ Waste type '{predicted_class}' tidak ada di YOUTUBE_FALLBACK")
     return {
         "title": "Tutorial tidak tersedia",
         "url": "#"
     }
-
-

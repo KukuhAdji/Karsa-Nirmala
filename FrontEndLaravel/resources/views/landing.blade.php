@@ -9,7 +9,7 @@
             {{-- Logo --}}
             <a href="#"
                class="group flex items-center gap-3"
-               aria-label="WISE Home">
+               aria-label="Karsa Nirmala Home">
 
                 <div class="relative w-16 h-16 shrink-0">
                     <img src="{{ asset('images/karsa-nirmala-logo.png') }}" alt="Karsa Nirmala logo" class="h-16 w-16 object-contain scale-[1.8] drop-shadow-sm">
@@ -100,7 +100,7 @@
             <div class="space-y-1">
                 <a href="#features"
                    class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-lime-50 hover:text-lime-700">
-                    <span>About WISE</span>
+                    <span>About Karsa</span>
 
                     <svg xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 24 24"
@@ -729,7 +729,7 @@
             </div>
 
             <p class="max-w-md text-base leading-relaxed text-slate-500 lg:text-right">
-                Every WISE feature supports one connected workflow, from waste identification
+                Every Karsa Nirmala feature supports one connected workflow, from waste identification
                 to practical environmental education.
             </p>
         </div>
@@ -781,7 +781,7 @@
                 </div>
             </article>
 
-            {{-- WISE AI Assistant --}}
+            {{-- Nirmala AI Assistant --}}
             <article class="group relative">
                 <div class="absolute -inset-1 rounded-[32px] bg-gradient-to-br from-fuchsia-400/60 to-purple-500/40 opacity-0 blur-xl transition duration-500 group-hover:opacity-100"></div>
 
@@ -811,7 +811,7 @@
                         </span>
 
                         <h3 class="mt-4 text-xl font-black leading-snug text-slate-900 transition duration-300 group-hover:text-purple-700">
-                            WISE AI Assistant
+                            Nirmala AI Assistant
                         </h3>
 
                         <p class="mt-4 text-sm leading-7 text-slate-500">

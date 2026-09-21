@@ -32,4 +32,9 @@ class BankSampah extends Model
             'bank_sampah_id'
         );
     }
+
+    public function marketplaceProducts(): HasMany
+    {
+        return $this->hasMany(MarketplaceProduct::class);
+    }
 }

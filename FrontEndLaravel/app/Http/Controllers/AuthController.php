@@ -62,7 +62,11 @@ class AuthController extends Controller
         // Log successful login
         \Log::info('User login successful: ' . $user->email);
 
-        return redirect()->intended(route('dashboard'))
+        $destination = $user->role === 'admin_bank_sampah'
+            ? route('admin.bank-sampah.dashboard')
+            : route('dashboard');
+
+        return redirect()->intended($destination)
             ->with('success', 'Login berhasil! Selamat datang.');
     }
 

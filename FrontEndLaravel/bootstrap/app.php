@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'bank-sampah-admin' => \App\Http\Middleware\EnsureBankSampahAdmin::class,
+            'bank-sampah-admin.access' => \App\Http\Middleware\RestrictBankSampahAdminAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

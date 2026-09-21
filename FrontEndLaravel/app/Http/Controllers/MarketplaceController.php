@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MarketplaceOrder;
+use App\Models\MarketplaceProduct;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
+
 class MarketplaceController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         // Dummy data untuk produk marketplace
         $products = [
@@ -178,6 +185,76 @@ class MarketplaceController extends Controller
             ]
         ];
 
+        $catalogProducts = MarketplaceProduct::with('bankSampah')
+            ->where('status', 'Tersedia')
+            ->latest()
+            ->get()
+            ->map(fn (MarketplaceProduct $product): array => [
+                'id' => $product->id,
+                'source' => 'catalog',
+                'name' => $product->name,
+                'description' => $product->description ?? '',
+                'price' => $product->price,
+                'image' => $product->image
+                    ? (preg_match('/^https?:\/\//i', $product->image)
+                        ? $product->image
+                        : asset('storage/' . $product->image))
+                    : asset('images/karsa-nirmala-logo.png'),
+                'bank_sampah' => $product->bankSampah?->name ?? 'Bank Sampah',
+                'bank_sampah_id' => $product->bank_sampah_id,
+                'rating' => 0,
+                'reviews' => 0,
+                'category' => $product->category ?? 'Lainnya',
+                'status' => $product->status,
+                'stock' => $product->stock,
+            ])
+            ->all();
+
+        $products = array_merge($catalogProducts, $products);
+
         return view('dashboard.marketplace', ['products' => $products]);
+    }
+
+    public function show(MarketplaceProduct $product): View
+    {
+        abort_unless($product->status === 'Tersedia', 404);
+
+        return view('dashboard.marketplace-detail', compact('product'));
+    }
+
+    public function buy(Request $request, MarketplaceProduct $product): RedirectResponse
+    {
+        $validated = $request->validate([
+            'customer_name' => ['required', 'string', 'min:2', 'max:255'],
+            'customer_phone' => ['required', 'string', 'min:8', 'max:30'],
+            'shipping_address' => ['required', 'string', 'min:10', 'max:2000'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        DB::transaction(function () use ($product, $validated, $request): void {
+            $lockedProduct = MarketplaceProduct::whereKey($product->id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedProduct->status !== 'Tersedia' || $validated['quantity'] > $lockedProduct->stock) {
+                abort(422, 'Stok produk tidak mencukupi.');
+            }
+
+            MarketplaceOrder::create([
+                'user_id' => $request->user()->id,
+                'marketplace_product_id' => $lockedProduct->id,
+                'customer_name' => $validated['customer_name'],
+                'customer_phone' => $validated['customer_phone'],
+                'shipping_address' => $validated['shipping_address'],
+                'quantity' => $validated['quantity'],
+                'unit_price' => $lockedProduct->price,
+                'total_price' => $lockedProduct->price * $validated['quantity'],
+                'status' => 'Menunggu konfirmasi',
+            ]);
+
+            $lockedProduct->decrement('stock', $validated['quantity']);
+        });
+
+        return redirect()
+            ->route('marketplace.product', $product)
+            ->with('success', 'Pesanan berhasil dibuat. Bank sampah akan menghubungi Anda untuk konfirmasi.');
     }
 }

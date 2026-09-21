@@ -131,18 +131,29 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-auto flex gap-2 pt-2">
-                        <button 
-                            type="button"
+                        @if (($product['source'] ?? null) === 'catalog')
+                        <a
+                            href="{{ route('marketplace.product', $product['id']) }}"
                             class="flex-1 rounded-[12px] bg-lime-50 py-2.5 text-xs font-bold text-lime-700 transition hover:bg-lime-100 border border-lime-200/50 flex items-center justify-center gap-2"
                         >
                             👁️ Lihat Detail
-                        </button>
-                        <button 
-                            type="button"
+                        </a>
+                        <a
+                            href="{{ route('marketplace.product', $product['id']) }}#buy"
                             class="flex-1 rounded-[12px] bg-gradient-to-r from-lime-500 to-green-600 py-2.5 text-xs font-bold text-white transition hover:shadow-lg flex items-center justify-center gap-2"
                         >
                             🛒 Beli
+                        </a>
+                        @else
+                        <button type="button" disabled
+                            class="flex-1 rounded-[12px] bg-slate-100 py-2.5 text-xs font-bold text-slate-400 cursor-not-allowed">
+                            Detail segera hadir
                         </button>
+                        <button type="button" disabled
+                            class="flex-1 rounded-[12px] bg-slate-100 py-2.5 text-xs font-bold text-slate-400 cursor-not-allowed">
+                            Beli segera hadir
+                        </button>
+                        @endif
                     </div>
 
                 </div>

@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'avatar',
+        'bank_sampah_id',
     ];
 
     /**
@@ -45,6 +48,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function bankSampah()
+    {
+        return $this->belongsTo(BankSampah::class);
     }
 
     public function classifications()

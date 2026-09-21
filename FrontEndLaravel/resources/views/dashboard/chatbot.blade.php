@@ -122,7 +122,7 @@ async function sendChat() {
 
     addChatBubble(message, 'user');
     chatInput.value = '';
-    chatStatus.textContent = 'Menghubungi FastAPI...';
+    chatStatus.textContent = 'Menunggu jawaban AI (maksimal 1 menit)...';
     showTypingIndicator();
     chatSendBtn.disabled = true;
     chatSendBtn.classList.add('opacity-60', 'cursor-not-allowed');
