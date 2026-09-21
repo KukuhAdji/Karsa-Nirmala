@@ -213,7 +213,9 @@ const nearbyBanksSection = document.getElementById('nearbyBanksSection');
 const nearbyBanksStatus = document.getElementById('nearbyBanksStatus');
 const nearbyBanksList = document.getElementById('nearbyBanksList');
 const nearbyBanksRetry = document.getElementById('nearbyBanksRetry');
-const BANKS_ENDPOINT = "{{ url('/api/bank-sampah') }}";
+// Keep this request on the same origin as the scanner page. This avoids
+// stale APP_URL values or an absolute URL pointing at the local environment.
+const BANKS_ENDPOINT = '/api/bank-sampah';
 
 let cameraStream = null;
 let currentImageFile = null;
