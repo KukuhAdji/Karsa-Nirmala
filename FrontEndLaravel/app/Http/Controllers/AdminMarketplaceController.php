@@ -17,7 +17,41 @@ class AdminMarketplaceController extends Controller
             ->latest()
             ->get();
 
-        return view('admin_banksampah.marketplace', compact('bankSampah', 'products'));
+        $orders = \App\Models\MarketplaceOrder::with(['product', 'user'])
+            ->whereHas('product', fn ($query) => $query->where('bank_sampah_id', $bankSampah->id))
+            ->latest()
+            ->get();
+
+        return view('admin_banksampah.marketplace', compact('bankSampah', 'products', 'orders'));
+    }
+
+    public function updateQris(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'qris_image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $bankSampah = $request->user()->bankSampah()->firstOrFail();
+        $newImage = $request->file('qris_image')->store('qris', 'public');
+
+        if ($bankSampah->qris_image) {
+            Storage::disk('public')->delete($bankSampah->qris_image);
+        }
+
+        $bankSampah->update(['qris_image' => $newImage]);
+
+        return back()->with('success', 'QRIS pembayaran berhasil diperbarui.');
+    }
+
+    public function orders(Request $request): View
+    {
+        $bankSampah = $request->user()->bankSampah()->firstOrFail();
+        $orders = \App\Models\MarketplaceOrder::with(['product', 'user'])
+            ->whereHas('product', fn ($query) => $query->where('bank_sampah_id', $bankSampah->id))
+            ->latest()
+            ->get();
+
+        return view('admin_banksampah.marketplace-orders', compact('bankSampah', 'orders'));
     }
 
     public function store(Request $request): RedirectResponse

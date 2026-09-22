@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MarketplaceProduct extends Model
 {
@@ -26,5 +27,10 @@ class MarketplaceProduct extends Model
     public function bankSampah(): BelongsTo
     {
         return $this->belongsTo(BankSampah::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(MarketplaceOrder::class);
     }
 }

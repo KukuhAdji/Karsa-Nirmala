@@ -7,6 +7,7 @@ use App\Models\MarketplaceProduct;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class MarketplaceController extends Controller
@@ -231,14 +232,14 @@ class MarketplaceController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        DB::transaction(function () use ($product, $validated, $request): void {
+        $order = DB::transaction(function () use ($product, $validated, $request): MarketplaceOrder {
             $lockedProduct = MarketplaceProduct::whereKey($product->id)->lockForUpdate()->firstOrFail();
 
             if ($lockedProduct->status !== 'Tersedia' || $validated['quantity'] > $lockedProduct->stock) {
                 abort(422, 'Stok produk tidak mencukupi.');
             }
 
-            MarketplaceOrder::create([
+            $order = MarketplaceOrder::create([
                 'user_id' => $request->user()->id,
                 'marketplace_product_id' => $lockedProduct->id,
                 'customer_name' => $validated['customer_name'],
@@ -247,14 +248,44 @@ class MarketplaceController extends Controller
                 'quantity' => $validated['quantity'],
                 'unit_price' => $lockedProduct->price,
                 'total_price' => $lockedProduct->price * $validated['quantity'],
-                'status' => 'Menunggu konfirmasi',
+                'status' => 'Menunggu pembayaran',
             ]);
 
             $lockedProduct->decrement('stock', $validated['quantity']);
+
+            return $order;
         });
 
-        return redirect()
-            ->route('marketplace.product', $product)
-            ->with('success', 'Pesanan berhasil dibuat. Bank sampah akan menghubungi Anda untuk konfirmasi.');
+        return redirect()->route('marketplace.payment', $order);
+    }
+
+    public function payment(Request $request, MarketplaceOrder $order): View
+    {
+        abort_unless((int) $order->user_id === (int) $request->user()->id, 403);
+
+        $order->load(['product.bankSampah']);
+
+        return view('dashboard.marketplace-payment', compact('order'));
+    }
+
+    public function uploadPaymentProof(Request $request, MarketplaceOrder $order): RedirectResponse
+    {
+        abort_unless((int) $order->user_id === (int) $request->user()->id, 403);
+
+        $request->validate([
+            'payment_proof' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $proof = $request->file('payment_proof')->store('payment-proofs', 'public');
+        if ($order->payment_proof) {
+            Storage::disk('public')->delete($order->payment_proof);
+        }
+
+        $order->update([
+            'payment_proof' => $proof,
+            'status' => 'Menunggu verifikasi pembayaran',
+        ]);
+
+        return back()->with('success', 'Bukti pembayaran berhasil dikirim ke bank sampah.');
     }
 }

@@ -15,6 +15,7 @@ class BankSampah extends Model
         'whatsapp',
         'status',
         'waste_type',
+        'qris_image',
     ];
 
     protected $casts = [

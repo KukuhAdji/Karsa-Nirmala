@@ -75,6 +75,10 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
                 ->name('catalog.update');
             Route::delete('/katalog/{product}', [AdminMarketplaceController::class, 'destroy'])
                 ->name('catalog.destroy');
+            Route::post('/qris', [AdminMarketplaceController::class, 'updateQris'])
+                ->name('qris.update');
+            Route::get('/pesanan', [AdminMarketplaceController::class, 'orders'])
+                ->name('orders');
         });
 
 
@@ -149,6 +153,10 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
         ->name('marketplace.product');
     Route::post('/marketplace/produk/{product}/beli', [MarketplaceController::class, 'buy'])
         ->name('marketplace.product.buy');
+    Route::get('/marketplace/pesanan/{order}/pembayaran', [MarketplaceController::class, 'payment'])
+        ->name('marketplace.payment');
+    Route::post('/marketplace/pesanan/{order}/pembayaran', [MarketplaceController::class, 'uploadPaymentProof'])
+        ->name('marketplace.payment.upload');
 
 
     /*

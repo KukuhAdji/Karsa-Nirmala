@@ -16,11 +16,17 @@ class MarketplaceOrder extends Model
         'quantity',
         'unit_price',
         'total_price',
+        'payment_proof',
         'status',
     ];
 
     public function product(): BelongsTo
     {
         return $this->belongsTo(MarketplaceProduct::class, 'marketplace_product_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
