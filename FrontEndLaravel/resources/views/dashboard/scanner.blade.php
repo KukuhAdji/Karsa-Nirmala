@@ -552,22 +552,31 @@ async function saveScan() {
     saveStatus.classList.add('text-emerald-600');
 
     try {
-        const response = await fetch("{{ route('scanner.upload') }}", {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (!csrfToken) {
+            throw new Error('Token keamanan halaman tidak tersedia. Muat ulang halaman lalu coba lagi.');
+        }
+
+        const response = await fetch('/scanner/upload', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
+            credentials: 'same-origin',
             body: formData,
         });
 
         const contentType = response.headers.get('content-type') || '';
         const result = contentType.includes('application/json')
             ? await response.json()
-            : { success: false, message: 'Server merespon dengan tipe yang tidak diharapkan.' };
+            : { success: false, message: `Server merespons dengan status ${response.status}.` };
 
         if (!response.ok || !result.success) {
-            throw new Error(result.message || 'Terjadi kesalahan saat menyimpan scan.');
+            const validationMessage = result.errors
+                ? Object.values(result.errors).flat().join(' ')
+                : '';
+            throw new Error(validationMessage || result.message || 'Terjadi kesalahan saat menyimpan scan.');
         }
 
         saveStatus.textContent = 'Penyimpanan selesai ✓';
