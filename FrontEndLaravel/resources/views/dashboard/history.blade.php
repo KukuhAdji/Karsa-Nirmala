@@ -24,7 +24,7 @@
                             if ($history->image && file_exists($storagePath)) {
                                 $imgUrl = asset('storage/' . $history->image);
                             } else {
-                                $imgUrl = asset('images/placeholder.png');
+                                $imgUrl = asset('images/karsa-nirmala-logo.png');
                             }
                         @endphp
                         <img 

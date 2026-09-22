@@ -153,7 +153,15 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
             # Jika success
             if response.status_code == 200:
                 data = response.json()
-                result = data["choices"][0]["message"]["content"]
+                result = _extract_completion_content(data)
+                if result is None:
+                    print(f"OpenRouter returned an unexpected response: {data}")
+                    return _build_local_chat_fallback(
+                        message,
+                        predicted_class,
+                        category,
+                        "ℹ️ Respons AI belum lengkap, jadi Peri Nirmala memberikan panduan lokal.",
+                    )
                 _response_cache[cache_key] = result
                 return result
 
@@ -389,7 +397,14 @@ def get_formatted_waste_recommendation(
 
             if response.status_code == 200:
                 data = response.json()
-                raw_response = data["choices"][0]["message"]["content"]
+                raw_response = _extract_completion_content(data)
+                if raw_response is None:
+                    print(f"OpenRouter returned an unexpected response: {data}")
+                    return _build_local_fallback_recommendation(
+                        predicted_class,
+                        confidence,
+                        "ℹ️ Respons AI belum lengkap. Panduan dasar berikut tetap dapat digunakan.",
+                    )
 
                 # Parse response ke struktur yang diinginkan
                 formatted_result = _parse_recommendation_response(raw_response, readable_class, confidence)
@@ -412,7 +427,6 @@ def get_formatted_waste_recommendation(
                         "closing": "⏱️ Server sedang sibuk. Coba lagi dalam beberapa saat ya 😊",
                         "low_confidence_warning": ""
                     }
-
             else:
                 try:
                     error_detail = response.json().get('error', {}).get('message', 'Unknown error')
@@ -461,6 +475,27 @@ def get_formatted_waste_recommendation(
         "closing": "⏱️ Gagal mengambil rekomendasi. Coba lagi nanti 😊",
         "low_confidence_warning": ""
     }
+
+
+def _extract_completion_content(data: object) -> Optional[str]:
+    """Return completion text only when OpenRouter returned the expected shape."""
+    if not isinstance(data, dict):
+        return None
+
+    choices = data.get("choices")
+    if not isinstance(choices, list) or not choices:
+        return None
+
+    first_choice = choices[0]
+    if not isinstance(first_choice, dict):
+        return None
+
+    message = first_choice.get("message")
+    if not isinstance(message, dict):
+        return None
+
+    content = message.get("content")
+    return content if isinstance(content, str) and content.strip() else None
 
 
 def _parse_recommendation_response(response_text: str, predicted_class: str, confidence: float) -> dict:
