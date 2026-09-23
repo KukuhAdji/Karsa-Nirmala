@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#79d20a">
 
-<title>WISE Login</title>
+<title>{{ config('app.name', 'Karsa Nirmala') }} - Login</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
