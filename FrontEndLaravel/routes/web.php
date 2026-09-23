@@ -79,6 +79,8 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
                 ->name('qris.update');
             Route::get('/pesanan', [AdminMarketplaceController::class, 'orders'])
                 ->name('orders');
+            Route::patch('/pesanan/{order}/konfirmasi-pembayaran', [AdminMarketplaceController::class, 'confirmPayment'])
+                ->name('orders.confirm-payment');
         });
 
 

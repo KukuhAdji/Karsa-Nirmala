@@ -11,6 +11,14 @@
             <a href="{{ route('admin.bank-sampah.catalog.index') }}" class="rounded-2xl border border-emerald-200 px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50">← Kembali ke Marketplace</a>
         </div>
 
+        @if (session('success'))
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{{ session('success') }}</div>
+        @endif
+
+        @if ($errors->any())
+            <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>
+        @endif
+
         @forelse ($orders as $order)
             <section class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
                 <div class="flex flex-col justify-between gap-2 sm:flex-row">
@@ -27,6 +35,15 @@
                         <p class="text-slate-500">Bukti pembayaran</p>
                         @if ($order->payment_proof)
                             <a href="{{ asset('storage/' . $order->payment_proof) }}" target="_blank" class="mt-1 inline-flex font-bold text-emerald-700 hover:underline">Lihat bukti pembayaran ↗</a>
+                            @if ($order->status !== 'Pembayaran dikonfirmasi')
+                                <form method="POST" action="{{ route('admin.bank-sampah.orders.confirm-payment', $order) }}" class="mt-3">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700" onclick="return confirm('Konfirmasi pembayaran pesanan ini?')">Konfirmasi Pembayaran</button>
+                                </form>
+                            @else
+                                <p class="mt-3 text-xs font-bold text-emerald-700">Pembayaran sudah dikonfirmasi.</p>
+                            @endif
                         @else
                             <p class="mt-1 font-semibold text-slate-400">Belum diunggah</p>
                         @endif

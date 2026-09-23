@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MarketplaceOrder;
 use App\Models\MarketplaceProduct;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class AdminMarketplaceController extends Controller
             ->latest()
             ->get();
 
-        $orders = \App\Models\MarketplaceOrder::with(['product', 'user'])
+        $orders = MarketplaceOrder::with(['product', 'user'])
             ->whereHas('product', fn ($query) => $query->where('bank_sampah_id', $bankSampah->id))
             ->latest()
             ->get();
@@ -46,12 +47,31 @@ class AdminMarketplaceController extends Controller
     public function orders(Request $request): View
     {
         $bankSampah = $request->user()->bankSampah()->firstOrFail();
-        $orders = \App\Models\MarketplaceOrder::with(['product', 'user'])
+        $orders = MarketplaceOrder::with(['product', 'user'])
             ->whereHas('product', fn ($query) => $query->where('bank_sampah_id', $bankSampah->id))
             ->latest()
             ->get();
 
         return view('admin_banksampah.marketplace-orders', compact('bankSampah', 'orders'));
+    }
+
+    public function confirmPayment(Request $request, MarketplaceOrder $order): RedirectResponse
+    {
+        abort_unless(
+            (int) $order->product()->value('bank_sampah_id') === (int) $request->user()->bank_sampah_id,
+            403,
+            'Pesanan tersebut bukan milik bank sampah Anda.'
+        );
+
+        if (!$order->payment_proof) {
+            return back()->withErrors([
+                'payment' => 'Pesanan belum memiliki bukti pembayaran.',
+            ]);
+        }
+
+        $order->update(['status' => 'Pembayaran dikonfirmasi']);
+
+        return back()->with('success', 'Pembayaran pesanan berhasil dikonfirmasi.');
     }
 
     public function store(Request $request): RedirectResponse
