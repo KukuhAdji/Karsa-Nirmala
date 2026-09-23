@@ -93,7 +93,9 @@
 
 
             <!-- User Profile -->
-            <div class="hidden sm:flex items-center gap-2 sm:gap-3 rounded-full border border-slate-200 bg-slate-50/80 px-2 sm:px-3 py-2 shadow-sm">
+            <a href="{{ route('profile') }}"
+                class="hidden sm:flex items-center gap-2 sm:gap-3 rounded-full border border-slate-200 bg-slate-50/80 px-2 sm:px-3 py-2 shadow-sm transition hover:border-lime-300 hover:bg-lime-50"
+                aria-label="Buka profil">
 
                 <img
                     src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'User') }}&background=E2F8D5&color=14532D"
@@ -113,16 +115,16 @@
 
                 </div>
 
-            </div>
+            </a>
 
             <!-- Mobile User Avatar Only -->
-            <div class="sm:hidden">
+            <a href="{{ route('profile') }}" class="sm:hidden" aria-label="Buka profil">
                 <img
                     src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'User') }}&background=E2F8D5&color=14532D"
                     alt="User Avatar"
                     class="w-8 h-8 rounded-full border-2 border-white shadow-sm"
                 >
-            </div>
+            </a>
 
         </div>
 

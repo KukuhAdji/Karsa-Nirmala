@@ -1,4 +1,5 @@
 import requests
+import re
 from typing import Optional
 import time
 from config import (
@@ -293,6 +294,9 @@ PANDUAN PENULISAN:
 - Fokus pada pengolahan sampah, nilai ekonomi, dan solusi nyata
 - Jangan menulis kalimat yang terlalu umum atau terlalu singkat
 - Jangan yang jawabannya berparagraf panjang tanpa nomor urut
+- Jangan gunakan Markdown seperti tanda bintang, tanda pagar, bullet, atau garis pemisah
+- Jangan gunakan garis horizontal atau dekorasi berulang
+- Tulis setiap langkah sebagai satu poin bernomor yang lengkap dan tidak terpotong
 
 JANGAN TAMBAHKAN APAPUN SELAIN FORMAT DI ATAS - tidak ada intro, tidak ada kalimat tambahan di awal atau akhir!""".strip()
 
@@ -380,7 +384,7 @@ def get_formatted_waste_recommendation(
         ],
         "temperature": 0.6,
         "top_p": 0.8,
-        "max_tokens": 700,
+        "max_tokens": 1400,
     }
 
     max_retries = 3
@@ -407,7 +411,11 @@ def get_formatted_waste_recommendation(
                     )
 
                 # Parse response ke struktur yang diinginkan
-                formatted_result = _parse_recommendation_response(raw_response, readable_class, confidence)
+                formatted_result = _parse_recommendation_response(
+                    raw_response,
+                    readable_class,
+                    confidence,
+                )
 
                 # Cache the response
                 _response_cache[cache_key] = formatted_result
@@ -505,7 +513,7 @@ def _parse_recommendation_response(response_text: str, predicted_class: str, con
     Returns:
         dict dengan: intro, recommendations (list), sdgs (list), closing, low_confidence_warning
     """
-    lines = response_text.strip().split('\n')
+    lines = _clean_recommendation_text(response_text).splitlines()
 
     recommendations = []
     economic_value = []
@@ -534,13 +542,18 @@ def _parse_recommendation_response(response_text: str, predicted_class: str, con
             current_section = 'closing'
             continue
 
-        if line and (line[0].isdigit() and ('.' in line[:3] or ')' in line[:3])):
-            item = line.split('.', 1)[1].strip() if '.' in line else line.split(')', 1)[1].strip()
+        numbered_item = re.match(r"^\s*\d+\s*[.)]\s*(.+)$", line)
+        if numbered_item:
+            item = numbered_item.group(1).strip()
             if current_section == 'recommendations':
                 recommendations.append(item)
             elif current_section == 'economic_value':
                 economic_value.append(item)
-        elif current_section == 'closing' and line:
+        elif current_section == 'recommendations' and recommendations:
+            recommendations[-1] = f"{recommendations[-1]} {line}".strip()
+        elif current_section == 'economic_value' and economic_value:
+            economic_value[-1] = f"{economic_value[-1]} {line}".strip()
+        elif current_section == 'closing':
             closing += line + " "
 
     closing = closing.strip()
@@ -556,6 +569,33 @@ def _parse_recommendation_response(response_text: str, predicted_class: str, con
         "closing": closing,
         "low_confidence_warning": low_confidence_warning
     }
+
+
+def _clean_recommendation_text(response_text: str) -> str:
+    """Remove markdown decoration while preserving numbered recommendation content."""
+    cleaned_lines = []
+
+    for raw_line in response_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            cleaned_lines.append("")
+            continue
+
+        if re.fullmatch(r"[-_=~*#`]{3,}", line):
+            continue
+
+        line = re.sub(r"^\s*#{1,6}\s*", "", line)
+        line = re.sub(r"\*\*(.*?)\*\*", r"\1", line)
+        line = re.sub(r"__(.*?)__", r"\1", line)
+        line = re.sub(r"(?<!\w)\*([^*]+)\*(?!\w)", r"\1", line)
+        line = re.sub(r"(?<!\w)_([^_]+)_(?!\w)", r"\1", line)
+        line = re.sub(r"^\s*[-*+]\s+", "", line)
+        line = re.sub(r"\s*[-—]{3,}\s*", " ", line)
+        line = re.sub(r"[ \t]{2,}", " ", line).strip()
+
+        cleaned_lines.append(line)
+
+    return "\n".join(cleaned_lines).strip()
 
 
 def get_waste_recommendation(
