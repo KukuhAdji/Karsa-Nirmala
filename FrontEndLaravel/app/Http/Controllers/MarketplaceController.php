@@ -99,9 +99,9 @@ class MarketplaceController extends Controller
             'payment_proof' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        $proof = $request->file('payment_proof')->store('payment-proofs', 'public');
+        $proof = $request->file('payment_proof')->store('payment-proofs', 's3');
         if ($order->payment_proof) {
-            Storage::disk('public')->delete($order->payment_proof);
+            Storage::disk('s3')->delete($order->payment_proof);
         }
 
         $order->update([

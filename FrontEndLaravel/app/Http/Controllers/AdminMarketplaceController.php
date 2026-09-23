@@ -78,7 +78,7 @@ class AdminMarketplaceController extends Controller
     {
         $validated = $this->validatedProduct($request, true);
         $validated['bank_sampah_id'] = $request->user()->bank_sampah_id;
-        $validated['image'] = $request->file('image')->store('marketplace', 'public');
+        $validated['image'] = $request->file('image')->store('marketplace', 's3');
 
         MarketplaceProduct::create($validated);
 
@@ -91,7 +91,7 @@ class AdminMarketplaceController extends Controller
         $validated = $this->validatedProduct($request);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('marketplace', 'public');
+            $validated['image'] = $request->file('image')->store('marketplace', 's3');
             $this->deleteStoredImage($product->image);
         }
 
@@ -130,7 +130,7 @@ class AdminMarketplaceController extends Controller
     private function deleteStoredImage(?string $image): void
     {
         if ($image && !preg_match('/^https?:\/\//i', $image)) {
-            Storage::disk('public')->delete($image);
+            Storage::disk('s3')->delete($image);
         }
     }
 
