@@ -56,7 +56,7 @@
 
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
-        @foreach($products as $product)
+        @forelse($products as $product)
             
             <div class="group relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white/90 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-lime-300/50 backdrop-blur-sm flex flex-col">
                 
@@ -73,13 +73,6 @@
                     <div class="absolute left-3 top-3">
                         <span class="inline-flex items-center rounded-full bg-white/95 backdrop-blur-sm px-3 py-1 text-xs font-bold text-slate-700 shadow-md">
                             📦 {{ $product['stock'] }} tersedia
-                        </span>
-                    </div>
-
-                    <!-- Rating Badge -->
-                    <div class="absolute right-3 top-3">
-                        <span class="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-md">
-                            ★ {{ number_format($product['rating'], 1) }}
                         </span>
                     </div>
 
@@ -117,11 +110,6 @@
                         {{ $product['description'] }}
                     </p>
 
-                    <!-- Rating & Reviews -->
-                    <div class="flex items-center gap-2 text-xs text-slate-500">
-                        <span>⭐ {{ $product['reviews'] }} ulasan</span>
-                    </div>
-
                     <!-- Price Section -->
                     <div class="flex items-baseline gap-2">
                         <span class="text-lg font-black text-lime-600">
@@ -131,7 +119,6 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-auto flex gap-2 pt-2">
-                        @if (($product['source'] ?? null) === 'catalog')
                         <a
                             href="{{ route('marketplace.product', $product['id']) }}"
                             class="flex-1 rounded-[12px] bg-lime-50 py-2.5 text-xs font-bold text-lime-700 transition hover:bg-lime-100 border border-lime-200/50 flex items-center justify-center gap-2"
@@ -144,23 +131,18 @@
                         >
                             🛒 Beli
                         </a>
-                        @else
-                        <button type="button" disabled
-                            class="flex-1 rounded-[12px] bg-slate-100 py-2.5 text-xs font-bold text-slate-400 cursor-not-allowed">
-                            Detail segera hadir
-                        </button>
-                        <button type="button" disabled
-                            class="flex-1 rounded-[12px] bg-slate-100 py-2.5 text-xs font-bold text-slate-400 cursor-not-allowed">
-                            Beli segera hadir
-                        </button>
-                        @endif
                     </div>
 
                 </div>
 
             </div>
 
-        @endforeach
+        @empty
+            <div class="rounded-[28px] border border-dashed border-slate-300 bg-white p-10 text-center md:col-span-2 lg:col-span-3 xl:col-span-4">
+                <p class="text-lg font-black text-slate-800">Belum ada produk marketplace</p>
+                <p class="mt-2 text-sm text-slate-500">Produk dari bank sampah akan tampil di sini setelah ditambahkan ke katalog.</p>
+            </div>
+        @endforelse
 
     </div>
 
