@@ -16,7 +16,7 @@ OPENROUTER_MODEL = os.getenv(
     "nvidia/nemotron-3.5-lightning:free",
 )
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_TIMEOUT_SECONDS = float(os.getenv("OPENROUTER_TIMEOUT_SECONDS", "60"))
+OPENROUTER_TIMEOUT_SECONDS = float(os.getenv("OPENROUTER_TIMEOUT_SECONDS", "120"))
 
 
 def openrouter_headers() -> dict[str, str]:

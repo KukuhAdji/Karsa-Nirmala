@@ -460,9 +460,11 @@ function updateResult(label, categoryKey, confidence, recommendationsText) {
     if (typeof recommendationsText === 'string') {
         recommendations.innerHTML = recommendationsText;
     } else if (Array.isArray(recommendationsText)) {
-        recommendations.innerHTML = recommendationsText
-            .map(item => `<p>• ${item}</p>`)
-            .join('');
+        recommendations.innerHTML = `
+            <ol class="list-decimal space-y-2 pl-5">
+                ${recommendationsText.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+            </ol>
+        `;
     }
 
     updateYoutubeTutorial(categoryKey);

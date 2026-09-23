@@ -72,15 +72,29 @@ function addChatBubble(text, sender) {
     const bubble = document.createElement('div');
     bubble.className = sender === 'user'
         ? 'max-w-[28rem] rounded-[24px] rounded-br-md border border-slate-200/80 bg-white px-5 py-3 text-sm leading-relaxed text-slate-800 shadow-[0_12px_25px_rgba(15,23,42,0.06)]'
-        : 'max-w-[30rem] rounded-[24px] rounded-tl-md border border-emerald-100 bg-emerald-50/80 px-4 py-3 text-sm leading-relaxed text-slate-800 shadow-[0_12px_25px_rgba(34,197,94,0.08)] backdrop-blur-sm';
+        : 'max-w-[30rem] whitespace-pre-line rounded-[24px] rounded-tl-md border border-emerald-100 bg-emerald-50/80 px-4 py-3 text-sm leading-relaxed text-slate-800 shadow-[0_12px_25px_rgba(34,197,94,0.08)] backdrop-blur-sm';
 
-    bubble.textContent = text;
+    bubble.textContent = sender === 'bot' ? cleanChatText(text) : text;
 
     if (sender === 'user') {
         wrapper.appendChild(bubble);
     } else {
         wrapper.appendChild(avatar);
         wrapper.appendChild(bubble);
+    }
+
+    function cleanChatText(value) {
+        return String(value ?? '')
+            .replace(/^\s*#{1,6}\s*/gm, '')
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/__(.*?)__/g, '$1')
+            .replace(/`([^`]*)`/g, '$1')
+            .replace(/^\s*[-*+]\s+/gm, '')
+            .replace(/^\s*[-_=~*#`]{3,}\s*$/gm, '')
+            .replace(/\s*[-—]{3,}\s*/g, ' ')
+            .replace(/[ \t]{2,}/g, ' ')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
     }
 
     chatMessages.appendChild(wrapper);

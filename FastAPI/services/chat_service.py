@@ -1,5 +1,6 @@
 import requests
 import re
+from html import escape
 from typing import Optional
 import time
 from config import (
@@ -88,6 +89,9 @@ PANDUAN RESPONS Anda:
    - Berikan edukasi tentang cara mengolah sampah secara benar
    - Tampilkan potensi nilai ekonomis jika dijual ke pengepul atau bank sampah
    - Jelaskan manfaat dari memilah sampah, mendaur ulang, dan mengurangi sampah yang berakhir di tempat pembuangan
+   - Jika menjelaskan langkah, gunakan nomor 1., 2., 3. dan tulis setiap langkah pada baris baru
+   - Jangan gunakan Markdown: tanpa tanda bintang, pagar, backtick, bullet, atau garis pemisah
+   - Jangan gunakan judul dekoratif atau simbol berulang
 
 Ingat: Respons harus terasa seperti ngobrol dengan teman yang peduli lingkungan, bukan bot formal.
 """.strip()
@@ -103,10 +107,10 @@ def chat_with_gemma(
         return "⚠️ OPENROUTER_API_KEY belum diset. Silakan setting env variable terlebih dahulu."
 
     # Generate cache key dari message (untuk pertanyaan yang sama, gunakan cache)
-    cache_key = f"{message}_{predicted_class}_{category}".lower()
+    cache_key = f"chat-v2_{message}_{predicted_class}_{category}".lower()
     if cache_key in _response_cache:
         print(f"Using cached response for: {cache_key}")
-        return _response_cache[cache_key]
+        return _clean_chat_response(_response_cache[cache_key])
 
     prompt = build_prompt(message, predicted_class, category, confidence)
 
@@ -120,7 +124,9 @@ def chat_with_gemma(
                 "content": """Kamu adalah Peri Nirmala, asisten edukasi lingkungan yang ramah dan peka terhadap pengelolaan sampah.
 Kamu bicara natural, warm, dan mendorong orang untuk ikut menjaga lingkungan dengan cara yang mudah dipahami.
 Fokus utamamu adalah edukasi tentang pengolahan sampah, cara memilah sampah, manfaat daur ulang, serta nilai ekonomis sampah jika dijual ke pengepul atau bank sampah.
-Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji secukupnya agar terasa menyenangkan. 💚♻️💰"""
+Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji secukupnya agar terasa menyenangkan. 💚♻️💰
+Jangan tampilkan proses berpikir, analisis internal, atau teks seperti "thinking process".
+Kirim hanya jawaban akhir yang langsung dapat dibaca pengguna."""
             },
             {
                 "role": "user",
@@ -129,7 +135,10 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
         ],
         "temperature": 0.7,
         "top_p": 0.9,
-        "max_tokens": 500,
+        "max_tokens": 900,
+        "reasoning": {
+            "exclude": True,
+        },
     }
 
     # Retry logic untuk handle rate limit
@@ -154,6 +163,38 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
             # Jika success
             if response.status_code == 200:
                 data = response.json()
+                embedded_error = data.get("error") if isinstance(data, dict) else None
+                if isinstance(embedded_error, dict):
+                    error_code = embedded_error.get("code")
+                    metadata = embedded_error.get("metadata")
+                    error_type = (
+                        metadata.get("error_type")
+                        if isinstance(metadata, dict)
+                        else None
+                    )
+                    is_retryable = (
+                        error_code in {429, 500, 502, 503, 504, "429", "500", "502", "503", "504"}
+                        or error_type
+                        in {"provider_overloaded", "timeout", "temporarily_unavailable"}
+                    )
+
+                    if is_retryable and attempt < max_retries - 1:
+                        wait_time = retry_delay * (2 ** attempt)
+                        print(
+                            f"Provider {OPENROUTER_MODEL} belum tersedia "
+                            f"({error_code}). Retry dalam {wait_time} detik..."
+                        )
+                        time.sleep(wait_time)
+                        continue
+
+                    return _build_local_chat_fallback(
+                        message,
+                        predicted_class,
+                        category,
+                        f"ℹ️ Provider AI {OPENROUTER_MODEL} sedang penuh atau tidak tersedia. "
+                        "Berikut panduan lokal yang dapat digunakan.",
+                    )
+
                 result = _extract_completion_content(data)
                 if result is None:
                     print(f"OpenRouter returned an unexpected response: {data}")
@@ -163,6 +204,7 @@ Gunakan bahasa Indonesia yang santai tapi tetap informatif, dan gunakan emoji se
                         category,
                         "ℹ️ Respons AI belum lengkap, jadi Peri Nirmala memberikan panduan lokal.",
                     )
+                result = _clean_chat_response(result)
                 _response_cache[cache_key] = result
                 return result
 
@@ -228,8 +270,10 @@ def _build_local_chat_fallback(
         f"{reason}\n\n"
         f"Untuk {readable_class}, langkah yang disarankan:\n"
         f"1. {handling}\n"
-        "2. Jangan mencampurnya dengan sampah basah atau limbah berbahaya.\n"
-        "3. Simpan dalam kondisi bersih dan kering sebelum disetorkan.\n\n"
+        "2. Pisahkan bagian yang masih dapat digunakan dari bagian yang rusak atau tercemar.\n"
+        "3. Cuci atau bersihkan dengan cara yang aman, kemudian keringkan seluruhnya.\n"
+        "4. Simpan dalam wadah tertutup dan kering sebelum disetorkan.\n"
+        "5. Setorkan ke bank sampah atau pengepul yang menerima jenis material tersebut.\n\n"
         f"Perkiraan nilai ekonomis: {economic_value}\n\n"
         "Pertanyaanmu sudah diterima. Coba lagi beberapa saat nanti jika ingin mendapatkan jawaban AI yang lebih spesifik. ♻️"
     )
@@ -324,8 +368,10 @@ def _build_local_fallback_recommendation(
         ),
         "recommendations": [
             handling,
-            "Pisahkan dari sampah basah atau berbahaya, lalu bersihkan dan keringkan jika aman dilakukan.",
-            "Simpan dalam wadah tertutup dan setorkan ke bank sampah atau pengepul yang menerima jenis ini.",
+            "Pisahkan dari sampah basah atau berbahaya agar material tidak terkontaminasi.",
+            "Bersihkan sisa kotoran dengan cara yang aman, lalu keringkan sampai tidak lembap.",
+            "Simpan dalam wadah tertutup yang kering dan pisahkan berdasarkan jenis materialnya.",
+            "Setorkan ke bank sampah atau pengepul yang menerima jenis ini, atau gunakan kembali bila masih layak.",
         ],
         "sdgs": [economic_value],
         "closing": reason,
@@ -384,7 +430,7 @@ def get_formatted_waste_recommendation(
         ],
         "temperature": 0.6,
         "top_p": 0.8,
-        "max_tokens": 1400,
+        "max_tokens": 1800,
     }
 
     max_retries = 3
@@ -556,6 +602,28 @@ def _parse_recommendation_response(response_text: str, predicted_class: str, con
         elif current_section == 'closing':
             closing += line + " "
 
+    # Jika model menghilangkan judul bagian, tetap ambil semua baris bernomor
+    # agar langkah pengolahan tidak hilang dari hasil scanner.
+    if not recommendations:
+        recommendations = [
+            re.match(r"^\s*\d+\s*[.)]\s*(.+)$", line).group(1).strip()
+            for line in lines
+            if re.match(r"^\s*\d+\s*[.)]\s*(.+)$", line)
+        ]
+
+    fallback_steps = [
+        "Pisahkan sampah berdasarkan jenisnya dan jauhkan dari sampah basah atau berbahaya.",
+        "Bersihkan sisa kotoran dengan cara yang aman, lalu keringkan sampai tidak lembap.",
+        "Potong, tekan, atau rapikan hanya jika aman agar mudah disimpan dan diangkut.",
+        "Simpan dalam wadah tertutup yang kering sebelum digunakan kembali atau disetorkan.",
+        "Setorkan ke bank sampah atau pengepul yang menerima material tersebut.",
+    ]
+    for step in fallback_steps:
+        if len(recommendations) >= 5:
+            break
+        if step not in recommendations:
+            recommendations.append(step)
+
     closing = closing.strip()
 
     low_confidence_warning = ""
@@ -598,6 +666,44 @@ def _clean_recommendation_text(response_text: str) -> str:
     return "\n".join(cleaned_lines).strip()
 
 
+def _clean_chat_response(response_text: str) -> str:
+    """Remove Markdown decoration from chatbot responses without removing useful text."""
+    response_text = re.sub(
+        r"(?is)^\s*(?:here(?:'s| is) a thinking process|thinking process)\s*:?.*?"
+        r"(?=\n\s*(?:jawaban akhir|final answer|jawaban:))",
+        "",
+        response_text,
+    )
+    response_text = re.sub(
+        r"(?im)^\s*(?:jawaban akhir|final answer|jawaban)\s*:?\s*$",
+        "",
+        response_text,
+    )
+
+    cleaned_lines = []
+    for raw_line in response_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            if cleaned_lines and cleaned_lines[-1] != "":
+                cleaned_lines.append("")
+            continue
+
+        if re.fullmatch(r"[-_=~*#`]{3,}", line):
+            continue
+
+        line = re.sub(r"^\s*#{1,6}\s*", "", line)
+        line = re.sub(r"\*\*(.*?)\*\*", r"\1", line)
+        line = re.sub(r"__(.*?)__", r"\1", line)
+        line = re.sub(r"(?<!\w)\*([^*]+)\*(?!\w)", r"\1", line)
+        line = re.sub(r"`([^`]*)`", r"\1", line)
+        line = re.sub(r"^\s*[-*+]\s+", "", line)
+        line = re.sub(r"\s*[-—]{3,}\s*", " ", line)
+        line = re.sub(r"[ \t]{2,}", " ", line).strip()
+        cleaned_lines.append(line)
+
+    return "\n".join(cleaned_lines).strip()
+
+
 def get_waste_recommendation(
     predicted_class: str,
     category: str,
@@ -618,30 +724,30 @@ def get_waste_recommendation(
     formatted = get_formatted_waste_recommendation(predicted_class, category, confidence)
 
     html = f"""<div class='recommendations-container'>
-        <p class='intro-text'>{formatted['intro']}</p>
+        <p class='intro-text'>{escape(formatted['intro'])}</p>
     """
 
     if formatted['recommendations']:
         html += "<div class='recommendations-section'>"
         html += "<h4>Rekomendasi Pengolahan untuk sampah {0}:</h4>".format(predicted_class.replace('_', ' ').title())
-        html += "<ol class='recommendations-list'>"
+        html += "<ol class='recommendations-list' style='list-style-type: decimal; padding-left: 1.5rem; margin-top: 0.5rem;'>"
         for rec in formatted['recommendations']:
-            html += f"<li>{rec}</li>"
+            html += f"<li>{escape(rec)}</li>"
         html += "</ol></div>"
 
     if formatted['sdgs']:
         html += "<div class='sdgs-section'>"
         html += "<h4>Potensi Nilai Ekonomis:</h4>"
-        html += "<ol class='sdgs-list'>"
+        html += "<ol class='sdgs-list' style='list-style-type: decimal; padding-left: 1.5rem; margin-top: 0.5rem;'>"
         for sdg in formatted['sdgs']:
-            html += f"<li>{sdg}</li>"
+            html += f"<li>{escape(sdg)}</li>"
         html += "</ol></div>"
 
     if formatted['closing']:
-        html += f"<p class='closing-text'>{formatted['closing']}</p>"
+        html += f"<p class='closing-text'>{escape(formatted['closing'])}</p>"
 
     if formatted['low_confidence_warning']:
-        html += f"<div class='warning-box'><p>{formatted['low_confidence_warning']}</p></div>"
+        html += f"<div class='warning-box'><p>{escape(formatted['low_confidence_warning'])}</p></div>"
 
     html += "</div>"
 
