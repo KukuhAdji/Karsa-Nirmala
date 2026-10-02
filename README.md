@@ -1,12 +1,12 @@
-# Waste Identification and Sustainability Education (WISE)
+# Karsa Nirmala, Sistem Cerdas Rekomendasi Pengelolaan Sampah Terintegrasi Computer Vision, GIS, dan LLM API
 
 Deskripsi singkat:
 
-- Proyek ini menggabungkan model Machine Learning (FastAPI) dan antarmuka web (Laravel) untuk mengidentifikasi jenis sampah dan memberikan edukasi keberlanjutan.
+- Proyek ini menggabungkan model Deep Learning dan web Laravel dengan FastAPI untuk mengidentifikasi jenis sampah dan memberikan edukasi keberlanjutan.
 
 Persyaratan singkat:
 
-- Python 3.8+ untuk backend
+- Python 3.9+ untuk backend
 - PHP 8+ dan Composer untuk frontend
 - Wajib install tensorflow 2.15
 
