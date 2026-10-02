@@ -32,6 +32,20 @@ WASTE_CLASS_INFO = {
 }
 
 
+def _price_range_for_waste(predicted_class: str) -> str:
+    """Return the locally known price estimate used to validate AI output."""
+    economic_value = WASTE_CLASS_INFO.get(
+        predicted_class.lower(),
+        {},
+    ).get("economic_value", "")
+    if re.search(r"Rp\s*[\d.,]+\s*(?:[–-]\s*Rp?\s*[\d.,]+)?\s*per\s*kg", economic_value, re.I):
+        return economic_value
+    return (
+        "Belum ada kisaran harga per kilogram yang cukup andal untuk jenis ini; "
+        "tanyakan harga terbaru kepada bank sampah atau pengepul setempat sebelum menjual."
+    )
+
+
 def build_prompt(
     message: str,
     predicted_class: Optional[str] = None,
@@ -316,7 +330,7 @@ REKOMENDASI PENGELOLAAN UNTUK SAMPAH {readable_class.upper()}:
 5. [Penjelasan langkah kelima: tindakan tambahan seperti kompos, recycle kreatif, pengemasan, atau penyimpanan agar lebih efisien]
 
 KISARAN HARGA PASAR PER 1 KG:
-1. [Berikan kisaran harga yang realistis untuk pasar lokal dalam satuan rupiah per 1 kilogram. Contoh: Rp 1.500–Rp 4.000 per kg]
+1. [WAJIB: tulis angka kisaran harga dalam format Rp X–Rp Y per kg. Jangan hanya menjelaskan faktor harga. Gunakan data acuan berikut jika relevan: {economic_value}]
 2. [Jelaskan faktor yang memengaruhi harga, seperti kebersihan, berat, warna, kondisi, dan pasar setempat]
 3. [Jika harga bisa sangat bervariasi, sebutkan bahwa estimasi bisa naik/turun tergantung volume, kondisi, dan penampungan]
 
@@ -360,6 +374,7 @@ def _build_local_fallback_recommendation(
         "Nilai ekonomis bergantung pada kebersihan, berat, dan harga setempat.",
     )
     readable_class = predicted_class.replace("_", " ").title()
+    price_range = _price_range_for_waste(predicted_class)
 
     return {
         "intro": (
@@ -373,7 +388,7 @@ def _build_local_fallback_recommendation(
             "Simpan dalam wadah tertutup yang kering dan pisahkan berdasarkan jenis materialnya.",
             "Setorkan ke bank sampah atau pengepul yang menerima jenis ini, atau gunakan kembali bila masih layak.",
         ],
-        "sdgs": [economic_value],
+        "sdgs": [price_range, economic_value],
         "closing": reason,
         "low_confidence_warning": (
             f"Confidence prediksi {confidence * 100:.1f}%. "
@@ -407,7 +422,7 @@ def get_formatted_waste_recommendation(
     readable_class = predicted_class.replace('_', ' ').title()
 
     # Generate cache key
-    cache_key = f"formatted_recommendation_{predicted_class}_{category}".lower()
+    cache_key = f"formatted_recommendation_v2_{predicted_class}_{category}".lower()
     if cache_key in _response_cache:
         print(f"Using cached formatted recommendation for: {predicted_class}")
         return _response_cache[cache_key]
@@ -625,6 +640,10 @@ def _parse_recommendation_response(response_text: str, predicted_class: str, con
             recommendations.append(step)
 
     closing = closing.strip()
+
+    economic_text = " ".join(economic_value)
+    if not re.search(r"Rp\s*[\d.,]+\s*(?:[–-]\s*Rp?\s*[\d.,]+)?\s*per\s*kg", economic_text, re.I):
+        economic_value.insert(0, _price_range_for_waste(predicted_class))
 
     low_confidence_warning = ""
     if confidence < 0.8:

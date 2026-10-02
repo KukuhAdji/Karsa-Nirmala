@@ -1,4 +1,4 @@
-{{-- =========================================================
+﻿{{-- =========================================================
 resources/views/dashboard/bank-sampah.blade.php
 
 KARSA NIRMALA - BANK SAMPAH GIS
@@ -52,6 +52,19 @@ REVISI TERBARU:
     <title>
         Bank Sampah - Karsa Nirmala
     </title>
+
+
+    {{-- =====================================================
+    TAILWIND (dibutuhkan component sidebar)
+    Preflight dimatikan agar tampilan halaman lain tidak berubah.
+    Jika project sudah memakai Tailwind via Vite, ganti blok ini dengan:
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    ====================================================== --}}
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { corePlugins: { preflight: false } };
+    </script>
 
 
     {{-- =====================================================
@@ -260,509 +273,84 @@ REVISI TERBARU:
 
 
         /* =====================================================
-           SIDEBAR
-           
-           SIDEBAR SELALU TERSEMBUNYI
-           DAN MUNCUL KETIKA HAMBURGER DIKLIK.
-           
-           TIDAK ADA TOMBOL X.
+           SIDEBAR (DRAWER)
+
+           Isi sidebar diambil dari component sidebar.blade.php.
+           Wrapper ini hanya mengatur posisi & animasi buka/tutup
+           lewat hamburger. Tidak ada tombol X.
         ====================================================== */
 
         .sidebar {
-
-            position:
-                fixed;
-
-            top:
-                8px;
-
-            left:
-                2px;
-
-            bottom:
-                8px;
-
-            width:
-                var(--sidebar-width);
-
-            background:
-                rgba(255,
-                    255,
-                    255,
-                    .97);
-
-            border:
-                1px solid rgba(203,
-                    213,
-                    225,
-                    .9);
-
-            border-radius:
-                28px;
-
-            overflow:
-                hidden;
-
-            box-shadow:
-                var(--shadow-sidebar);
-
-            transform:
-                translateX(calc(-100% - 30px));
-
-            opacity:
-                0;
-
-            visibility:
-                hidden;
-
-            transition:
-                transform .25s ease,
-                opacity .2s ease,
-                visibility .25s ease;
-
-            z-index:
-                5000;
-
+            position: fixed;
+            top: 8px;
+            left: 2px;
+            bottom: 8px;
+            width: var(--sidebar-width);
+            max-width: calc(100vw - 22px);
+            transform: translateX(calc(-100% - 30px));
+            opacity: 0;
+            visibility: hidden;
+            transition: transform .25s ease, opacity .2s ease, visibility .25s ease;
+            z-index: 5000;
         }
-
 
         .sidebar.open {
-
-            transform:
-                translateX(0);
-
-            opacity:
-                1;
-
-            visibility:
-                visible;
-
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
         }
 
-
-        /* =====================================================
-           SIDEBAR HEADER
-        ====================================================== */
-
-        .sidebar-header {
-
-            min-height:
-                125px;
-
-            padding:
-                17px 22px 18px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            border-bottom:
-                1px solid #e2e8f0;
-
+        /* <aside> dari component dibuat mengisi wrapper drawer */
+        .sidebar > aside {
+            position: static;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: none;
+            height: 100%;
+            min-height: 0;
         }
 
-
-        .sidebar-brand {
-
-            width:
-                100%;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                15px;
-
+        .sidebar > aside > .sidebar-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
         }
 
-
-        /* =====================================================
-           LOGO
-           
-           DIBUAT BESAR.
-           OBJECT-CONTAIN SUPAYA TIDAK BERANTAKAN.
-        ====================================================== */
-
-        .logo-image-wrapper {
-
-            width:
-                62px;
-
-            height:
-                62px;
-
-            flex:
-                0 0 62px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            background:
-                #ffffff;
-
-            border-radius:
-                18px;
-
-            overflow:
-                hidden;
-
+        /* Pengganti Tailwind preflight (preflight dimatikan agar CSS halaman tidak berubah) */
+        :where(.sidebar) *,
+        :where(.sidebar) ::before,
+        :where(.sidebar) ::after {
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb;
         }
 
-
-        .sidebar-logo-image {
-
-            width:
-                62px;
-
-            height:
-                62px;
-
-            max-width:
-                100%;
-
-            max-height:
-                100%;
-
-            object-fit:
-                contain;
-
-            object-position:
-                center;
-
-            display:
-                block;
-
+        :where(.sidebar) h2,
+        :where(.sidebar) p {
+            margin: 0;
         }
 
-
-        .sidebar-brand-text {
-
-            min-width:
-                0;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            justify-content:
-                center;
-
+        :where(.sidebar) button {
+            background: transparent;
+            color: inherit;
         }
 
-
-        .sidebar-brand-text strong {
-
-            color:
-                #111827;
-
-            font-size:
-                25px;
-
-            line-height:
-                1;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                -.7px;
-
-            white-space:
-                nowrap;
-
+        :where(.sidebar) a {
+            color: inherit;
         }
 
-
-        .sidebar-brand-text span {
-
-            margin-top:
-                8px;
-
-            color:
-                #64748b;
-
-            font-size:
-                11px;
-
-            line-height:
-                1.45;
-
-            font-weight:
-                500;
-
-            max-width:
-                205px;
-
+        :where(.sidebar) img,
+        :where(.sidebar) svg {
+            display: block;
         }
 
-
-        /* =====================================================
-           SIDEBAR CONTENT
-        ====================================================== */
-
-        .sidebar-content {
-
-            height:
-                calc(100% - 125px);
-
-            padding:
-                19px 20px 25px;
-
-            overflow-y:
-                auto;
-
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 6px;
         }
 
-
-        .sidebar-content::-webkit-scrollbar {
-
-            width:
-                5px;
-
-        }
-
-
-        .sidebar-content::-webkit-scrollbar-track {
-
-            background:
-                transparent;
-
-        }
-
-
-        .sidebar-content::-webkit-scrollbar-thumb {
-
-            background:
-                #d7dee8;
-
-            border-radius:
-                20px;
-
-        }
-
-
-        .sidebar-section-title {
-
-            margin:
-                0 13px 17px;
-
-            color:
-                #94a3b8;
-
-            font-size:
-                12px;
-
-            line-height:
-                1;
-
-            font-weight:
-                900;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .035em;
-
-        }
-
-
-        /* =====================================================
-           SIDEBAR MENU
-        ====================================================== */
-
-        .sidebar-menu {
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                7px;
-
-        }
-
-
-        .sidebar-link {
-
-            width:
-                100%;
-
-            min-height:
-                62px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                13px;
-
-            padding:
-                8px 10px;
-
-            border-radius:
-                16px;
-
-            color:
-                #172033;
-
-            background:
-                transparent;
-
-            border:
-                1px solid transparent;
-
-            text-decoration:
-                none;
-
-            font-size:
-                16px;
-
-            font-weight:
-                500;
-
-            transition:
-                background .18s ease,
-                color .18s ease,
-                border-color .18s ease,
-                transform .18s ease;
-
-        }
-
-
-        .sidebar-link:hover {
-
-            background:
-                #f4fae9;
-
-            color:
-                #4d9900;
-
-        }
-
-
-        .sidebar-link.active {
-
-            background:
-                #f3ffdf;
-
-            color:
-                #4d9900;
-
-            border-color:
-                #c7f36b;
-
-            box-shadow:
-                0 4px 12px rgba(121,
-                    210,
-                    10,
-                    .08);
-
-            font-weight:
-                700;
-
-        }
-
-
-        .sidebar-link-icon {
-
-            width:
-                46px;
-
-            height:
-                46px;
-
-            flex:
-                0 0 46px;
-
-            border-radius:
-                15px;
-
-            background:
-                #f0f4f8;
-
-            color:
-                #53667f;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-        }
-
-
-        .sidebar-link-icon svg {
-
-            width:
-                21px;
-
-            height:
-                21px;
-
-        }
-
-
-        .sidebar-link.active .sidebar-link-icon {
-
-            background:
-                #ffffff;
-
-            color:
-                #61ad08;
-
-        }
-
-
-        .sidebar-link.logout {
-
-            color:
-                #ef3340;
-
-        }
-
-
-        .sidebar-link.logout:hover {
-
-            background:
-                #fff1f2;
-
-            color:
-                #ef3340;
-
-        }
-
-
-        .sidebar-link.logout .sidebar-link-icon {
-
-            color:
-                #ff3042;
-
-            background:
-                #f5f7fa;
-
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
         }
 
 
@@ -3154,27 +2742,6 @@ REVISI TERBARU:
 
             }
 
-
-            .sidebar {
-
-                width:
-                    min(325px,
-                        calc(100vw - 22px));
-
-                top:
-                    6px;
-
-                left:
-                    2px;
-
-                bottom:
-                    6px;
-
-                border-radius:
-                    25px;
-
-            }
-
         }
 
 
@@ -3324,64 +2891,6 @@ REVISI TERBARU:
 
             }
 
-
-            .sidebar-header {
-
-                min-height:
-                    118px;
-
-                padding:
-                    16px 19px;
-
-            }
-
-
-            .logo-image-wrapper,
-            .sidebar-logo-image {
-
-                width:
-                    58px;
-
-                height:
-                    58px;
-
-            }
-
-
-            .logo-image-wrapper {
-
-                flex-basis:
-                    58px;
-
-            }
-
-
-            .sidebar-brand-text strong {
-
-                font-size:
-                    22px;
-
-            }
-
-
-            .sidebar-brand-text span {
-
-                font-size:
-                    10px;
-
-            }
-
-
-            .sidebar-content {
-
-                height:
-                    calc(100% - 118px);
-
-                padding:
-                    18px 16px 22px;
-
-            }
-
         }
     </style>
 
@@ -3405,283 +2914,530 @@ REVISI TERBARU:
     SIDEBAR DIBUKA/TUTUP MELALUI HAMBURGER.
     ========================================================= --}}
 
-    <aside id="sidebar" class="sidebar" aria-label="Sidebar navigasi" aria-hidden="true">
+    <div id="sidebar" class="sidebar" role="dialog" aria-label="Sidebar navigasi" aria-hidden="true">
 
-        {{-- =====================================================
-        SIDEBAR HEADER
-        ====================================================== --}}
+        <aside
+            class="w-full max-w-xs lg:w-72 lg:flex-none
+                   bg-white/90
+                   border border-slate-200/80
+                   rounded-[32px]
+                   min-h-screen
+                   lg:sticky top-5
+                   shadow-[0_26px_60px_rgba(15,23,42,0.06)]
+                   backdrop-blur-xl
+                   overflow-hidden"
+        >
 
-        <div class="sidebar-header">
+            <!-- ========================================================= -->
+            <!-- SIDEBAR HEADER -->
+            <!-- ========================================================= -->
 
-            <div class="sidebar-brand">
+            <div class="h-28 border-b border-slate-200/80 px-5 flex items-center">
 
-                <div class="logo-image-wrapper">
+                <div class="flex items-center gap-3 w-full">
 
-                    <img src="{{ asset('images/karsa-nirmala-logo.png') }}" alt="Karsa Nirmala"
-                        class="sidebar-logo-image">
+                    <!-- LOGO -->
+                    <div class="w-16 h-16 flex items-center justify-center shrink-0">
 
-                </div>
+                        <img
+                            src="{{ asset('images/karsa-nirmala-logo.png') }}"
+                            alt="Karsa Nirmala logo"
+                            class="w-16 h-16 object-contain scale-[1.8] drop-shadow-sm"
+                        >
+
+                    </div>
 
 
-                <div class="sidebar-brand-text">
+                    <!-- BRAND -->
+                    <div class="min-w-0 flex-1">
 
-                    <strong>
-                        Karsa Nirmala
-                    </strong>
+                        <h2
+                            class="font-black
+                                   text-[1.45rem]
+                                   leading-none
+                                   tracking-tight
+                                   text-slate-900
+                                   whitespace-nowrap"
+                        >
+                            Karsa Nirmala
+                        </h2>
 
-                    <span>
-                        Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
-                    </span>
+                        <p
+                            class="mt-1
+                                   text-[0.65rem]
+                                   text-slate-500
+                                   leading-snug
+                                   font-medium"
+                        >
+                            Sistem Cerdas Pengelolaan Sampah | Ekonomi Sirkular
+                        </p>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
 
-
-        {{-- =====================================================
-        SIDEBAR CONTENT
-        ====================================================== --}}
-
-        <div class="sidebar-content">
-
-            <p class="sidebar-section-title">
-                Main Menu
-            </p>
-
-
-            <nav class="sidebar-menu">
-
-
-                {{-- =================================================
-                DASHBOARD
-                ================================================== --}}
-
-                <a href="{{ route('dashboard') }}" class="sidebar-link">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <path d="m3 10 9-7 9 7" />
-
-                            <path d="M5 9v11h14V9" />
-
-                            <path d="M9 20v-6h6v6" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        Dashboard
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                AI SCANNER
-                ================================================== --}}
-
-                <a href="{{ route('scanner') }}" class="sidebar-link">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <rect x="3" y="7" width="18" height="13" rx="2" />
-
-                            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-
-                            <path d="M12 11v5" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        AI Scanner
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                HISTORY SCAN
-                ================================================== --}}
-
-                <a href="{{ route('scanner.history') }}" class="sidebar-link">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <path d="M4 6h16" />
-
-                            <path d="M4 12h16" />
-
-                            <path d="M4 18h16" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        History Scan
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                GIS
-                ACTIVE
-                ================================================== --}}
-
-                <a href="{{ route('bank-sampah') }}" class="sidebar-link active">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z" />
-
-                            <path d="M9 3v15" />
-
-                            <path d="M15 6v15" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        GIS
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                EDUCATION
-                ================================================== --}}
-
-                <a href="{{ route('education') }}" class="sidebar-link">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z" />
-
-                            <path d="M4 18a2.5 2.5 0 0 1 2.5-2.5H20" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        Education
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                AI CHATBOT
-                ================================================== --}}
-
-                <a href="{{ route('chatbot') }}" class="sidebar-link">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-6.5A7.5 7.5 0 0 1 11.5 8H20v3.5Z" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        AI Chatbot
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                PROFILE
-                ================================================== --}}
-
-                <a href="{{ route('profile') }}" class="sidebar-link">
-
-                    <span class="sidebar-link-icon">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                            <circle cx="12" cy="7" r="4" />
-
-                            <path d="M5 21a7 7 0 0 1 14 0" />
-
-                        </svg>
-
-                    </span>
-
-                    <span>
-                        Profile
-                    </span>
-
-                </a>
-
-
-                {{-- =================================================
-                LOGOUT
-                ================================================== --}}
-
-                <form action="{{ route('logout') }}" method="POST">
-
-                    @csrf
-
-                    <button type="submit" class="sidebar-link logout">
-
-                        <span class="sidebar-link-icon">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-
-                                <polyline points="16 17 21 12 16 7" />
-
-                                <line x1="21" y1="12" x2="9" y2="12" />
+            <!-- ========================================================= -->
+            <!-- SIDEBAR CONTENT -->
+            <!-- ========================================================= -->
+
+            @php
+                $isDashboard = request()->routeIs('dashboard');
+                $isScanner = request()->routeIs(['scanner', 'scanner.history']);
+                $isBankSampah = request()->routeIs('bank-sampah');
+                $isMarketplace = request()->routeIs('marketplace');
+                $isMarketplaceCatalog = request()->routeIs('admin.bank-sampah.catalog.*');
+                $isBankSampahAdmin = auth()->user()?->role === 'admin_bank_sampah';
+            @endphp
+
+            <div class="p-4 sidebar-scroll overflow-y-auto min-h-[calc(100vh-7rem)]">
+
+                <!-- MAIN MENU -->
+                <p class="text-xs uppercase font-bold text-slate-400 px-3 mb-3">
+                    Main Menu
+                </p>
+
+
+                <nav class="space-y-2">
+                    @if ($isBankSampahAdmin)
+                        <a href="{{ route('admin.bank-sampah.dashboard') }}"
+                            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 transition-colors duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm">⚙</span>
+                            <span class="font-semibold">Kelola Bank Sampah</span>
+                        </a>
+                        <a href="{{ route('admin.bank-sampah.catalog.index') }}"
+                            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 transition-colors duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm">🛒</span>
+                            <span class="font-semibold">Kelola Marketplace</span>
+                        </a>
+                        <a href="{{ route('chatbot') }}"
+                            class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-700 transition-colors duration-200 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm">💬</span>
+                            <span class="font-semibold">AI Chatbot</span>
+                        </a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-left text-slate-700 transition-colors duration-200 hover:border-red-200 hover:bg-red-50 hover:text-red-600">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-red-500 shadow-sm">↪</span>
+                                <span class="font-semibold">Logout</span>
+                            </button>
+                        </form>
+                    @endif
+
+                    @unless ($isBankSampahAdmin)
+                    <!-- ================================================= -->
+                    <!-- DASHBOARD -->
+                    <!-- ================================================= -->
+
+                    @if (!$isBankSampahAdmin)
+                    <a
+                        href="{{ route('dashboard') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               {{ $isDashboard ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-slate-50 hover:text-lime-700' }}
+                               transition-colors duration-200"
+                    >
+
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-white
+                                   flex items-center justify-center
+                                   text-lime-600
+                                   shadow-sm
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path d="M3 9.5L12 3l9 6.5v11a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V15H10v6.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-11z" />
 
                             </svg>
 
                         </span>
 
-                        <span>
-                            Logout
+                        <span class="font-semibold">
+                            Dashboard
                         </span>
 
-                    </button>
+                    </a>
+                    @endif
 
-                </form>
+
+                    <!-- ================================================= -->
+                    <!-- AI SCANNER -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{{ route('scanner') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               {{ $isScanner ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-slate-50 hover:text-lime-700' }}
+                               transition-colors duration-200"
+                    >
+
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-slate-100
+                                   flex items-center justify-center
+                                   text-slate-600
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <rect
+                                    x="3"
+                                    y="7"
+                                    width="18"
+                                    height="13"
+                                    rx="2"
+                                    ry="2"
+                                />
+
+                                <path
+                                    d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"
+                                />
+
+                                <path d="M12 11v6" />
+
+                            </svg>
+
+                        </span>
+
+                        <span class="font-semibold">
+                            AI Scanner
+                        </span>
+
+                    </a>
 
 
-            </nav>
+                    <!-- ================================================= -->
+                    <!-- HISTORY -->
+                    <!-- ================================================= -->
 
-        </div>
+                    <a
+                        href="{{ route('scanner.history') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               hover:bg-lime-50
+                               hover:text-lime-600
+                               transition-colors duration-200"
+                    >
 
-    </aside>
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-slate-100
+                                   flex items-center justify-center
+                                   text-slate-600
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path d="M4 19h16" />
+                                <path d="M4 12h16" />
+                                <path d="M4 5h16" />
+
+                            </svg>
+
+                        </span>
+
+                        <span class="font-semibold">
+                            History Scan
+                        </span>
+
+                    </a>
+
+                    @endunless
+
+                    @if (!$isBankSampahAdmin)
+                    <!-- ================================================= -->
+                    <!-- GIS -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{{ route('bank-sampah') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               {{ $isBankSampah ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-lime-50 hover:text-lime-600' }}
+                               transition-colors duration-200"
+                    >
+
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-slate-100
+                                   flex items-center justify-center
+                                   text-slate-600
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path d="M3 6l4-1 5 2 5-2 4 1v12l-4 1-5-2-5 2-4-1V6z" />
+                                <path d="M8 5v12" />
+                                <path d="M13 7v10" />
+                                <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+
+                            </svg>
+
+                        </span>
+
+                        <span class="font-semibold">
+                            GIS
+                        </span>
+
+                    </a>
+
+                    <!-- ================================================= -->
+                    <!-- MARKETPLACE -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{{ route('marketplace') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               {{ $isMarketplace ? 'bg-lime-50 text-lime-700 border border-lime-200 shadow-sm' : 'hover:bg-lime-50 hover:text-lime-600' }}
+                               transition-colors duration-200"
+                    >
+
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-slate-100
+                                   flex items-center justify-center
+                                   text-slate-600
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+
+                            </svg>
+
+                        </span>
+
+                        <span class="font-semibold">
+                            Marketplace
+                        </span>
+
+                    </a>
+                    @endif
+
+                    <!-- ================================================= -->
+                    <!-- AI CHATBOT -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{{ route('chatbot') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               hover:bg-lime-50
+                               hover:text-lime-600
+                               transition-colors duration-200"
+                    >
+
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-slate-100
+                                   flex items-center justify-center
+                                   text-slate-600
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path
+                                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                />
+
+                            </svg>
+
+                        </span>
+
+                        <span class="font-semibold">
+                            AI Chatbot
+                        </span>
+
+                    </a>
+
+                    @unless ($isBankSampahAdmin)
+                    <!-- ================================================= -->
+                    <!-- PROFILE -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{{ route('profile') }}"
+                        class="flex items-center gap-3 p-3 rounded-2xl
+                               hover:bg-lime-50
+                               hover:text-lime-600
+                               transition-colors duration-200"
+                    >
+
+                        <span
+                            class="w-10 h-10 rounded-2xl
+                                   bg-slate-100
+                                   flex items-center justify-center
+                                   text-slate-600
+                                   shrink-0"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path
+                                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                                />
+
+                                <circle
+                                    cx="12"
+                                    cy="7"
+                                    r="4"
+                                />
+
+                            </svg>
+
+                        </span>
+
+                        <span class="font-semibold">
+                            Profile
+                        </span>
+
+                    </a>
+
+
+                    <!-- ================================================= -->
+                    <!-- LOGOUT -->
+                    <!-- ================================================= -->
+
+                    <form
+                        action="{{ route('logout') }}"
+                        method="POST"
+                    >
+
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="w-full text-left
+                                   flex items-center gap-3 p-3 rounded-2xl
+                                   text-red-500
+                                   hover:bg-red-50
+                                   transition-colors duration-200"
+                        >
+
+                            <span
+                                class="w-10 h-10 rounded-2xl
+                                       bg-slate-100
+                                       flex items-center justify-center
+                                       text-red-500
+                                       shrink-0"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+
+                                    <path
+                                        d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                                    />
+
+                                    <polyline points="16 17 21 12 16 7" />
+
+                                    <line
+                                        x1="21"
+                                        y1="12"
+                                        x2="9"
+                                        y2="12"
+                                    />
+
+                                </svg>
+
+                            </span>
+
+                            <span class="font-semibold">
+                                Logout
+                            </span>
+
+                        </button>
+
+                    </form>
+                    @endunless
+
+                </nav>
+
+            </div>
+
+        </aside>
+
+    </div>
 
 
     {{-- =========================================================
