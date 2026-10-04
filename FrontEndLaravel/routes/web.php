@@ -14,6 +14,11 @@ use App\Http\Controllers\AdminBankSampahController;
 use App\Http\Controllers\AdminMarketplaceController;
 
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\BankSampahController as SuperAdminBankSampahController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Landing Page
@@ -69,44 +74,183 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
+Route::middleware([
+    'auth',
+    'bank-sampah-admin.access'
+])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout
+    |--------------------------------------------------------------------------
+    */
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Bank Sampah Routes
+    |--------------------------------------------------------------------------
+    |
+    | Khusus untuk role admin_bank_sampah.
+    |
+    */
 
     Route::middleware('bank-sampah-admin')
         ->prefix('admin/bank-sampah')
         ->name('admin.bank-sampah.')
         ->group(function () {
-            Route::get('/', [AdminBankSampahController::class, 'index'])
-                ->name('dashboard');
-            Route::put('/', [AdminBankSampahController::class, 'update'])
-                ->name('update');
-            Route::get('/katalog', [AdminMarketplaceController::class, 'index'])
-                ->name('catalog.index');
-            Route::post('/katalog', [AdminMarketplaceController::class, 'store'])
-                ->name('catalog.store');
-            Route::put('/katalog/{product}', [AdminMarketplaceController::class, 'update'])
-                ->name('catalog.update');
-            Route::delete('/katalog/{product}', [AdminMarketplaceController::class, 'destroy'])
-                ->name('catalog.destroy');
-            Route::post('/qris', [AdminMarketplaceController::class, 'updateQris'])
-                ->name('qris.update');
-            Route::get('/pesanan', [AdminMarketplaceController::class, 'orders'])
-                ->name('orders');
-            Route::patch('/pesanan/{order}/konfirmasi-pembayaran', [AdminMarketplaceController::class, 'confirmPayment'])
-                ->name('orders.confirm-payment');
+
+            /*
+            | Dashboard Admin Bank Sampah
+            */
+            Route::get('/', [
+                AdminBankSampahController::class,
+                'index'
+            ])->name('dashboard');
+
+
+            /*
+            | Update Bank Sampah milik Admin
+            */
+            Route::put('/', [
+                AdminBankSampahController::class,
+                'update'
+            ])->name('update');
+
+
+            /*
+            | Katalog Marketplace
+            */
+            Route::get('/katalog', [
+                AdminMarketplaceController::class,
+                'index'
+            ])->name('catalog.index');
+
+            Route::post('/katalog', [
+                AdminMarketplaceController::class,
+                'store'
+            ])->name('catalog.store');
+
+            Route::put('/katalog/{product}', [
+                AdminMarketplaceController::class,
+                'update'
+            ])->name('catalog.update');
+
+            Route::delete('/katalog/{product}', [
+                AdminMarketplaceController::class,
+                'destroy'
+            ])->name('catalog.destroy');
+
+
+            /*
+            | QRIS
+            */
+            Route::post('/qris', [
+                AdminMarketplaceController::class,
+                'updateQris'
+            ])->name('qris.update');
+
+
+            /*
+            | Pesanan
+            */
+            Route::get('/pesanan', [
+                AdminMarketplaceController::class,
+                'orders'
+            ])->name('orders');
+
+            Route::patch(
+                '/pesanan/{order}/konfirmasi-pembayaran',
+                [
+                    AdminMarketplaceController::class,
+                    'confirmPayment'
+                ]
+            )->name('orders.confirm-payment');
+
         });
 
 
     /*
     |--------------------------------------------------------------------------
-    | Dashboard
+    | Super Admin Routes
+    |--------------------------------------------------------------------------
+    |
+    | Khusus untuk role super_admin.
+    |
+    */
+
+    Route::middleware('super-admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Super Admin
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('/', [
+                AdminDashboardController::class,
+                'index'
+            ])->name('dashboard');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Manajemen Akun
+            |--------------------------------------------------------------------------
+            */
+
+            Route::resource(
+                'users',
+                AdminUserController::class
+            )->except([
+                        'show'
+                    ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Manajemen Bank Sampah
+            |--------------------------------------------------------------------------
+            |
+            | URL:
+            | /admin/manage-bank-sampah
+            |
+            | Nama route:
+            | admin.manage-bank-sampah.*
+            |
+            */
+
+            Route::resource(
+                'manage-bank-sampah',
+                SuperAdminBankSampahController::class
+            )
+                ->except([
+                    'show'
+                ])
+                ->parameters([
+                    'manage-bank-sampah' => 'bank_sampah',
+                ])
+                ->names('manage-bank-sampah');
+
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard User
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    Route::get('/dashboard', [
+        DashboardController::class,
+        'index'
+    ])->name('dashboard');
 
 
     /*
@@ -115,14 +259,20 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::post('/scanner/upload', [ScannerController::class, 'store'])
-        ->name('scanner.upload');
+    Route::post('/scanner/upload', [
+        ScannerController::class,
+        'store'
+    ])->name('scanner.upload');
 
-    Route::get('/scanner', [ScannerController::class, 'index'])
-        ->name('scanner');
+    Route::get('/scanner', [
+        ScannerController::class,
+        'index'
+    ])->name('scanner');
 
-    Route::get('/scanner/history', [ScannerController::class, 'history'])
-        ->name('scanner.history');
+    Route::get('/scanner/history', [
+        ScannerController::class,
+        'history'
+    ])->name('scanner.history');
 
 
     /*
@@ -131,11 +281,15 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/education', [EducationController::class, 'index'])
-        ->name('education');
+    Route::get('/education', [
+        EducationController::class,
+        'index'
+    ])->name('education');
 
-    Route::get('/education/{slug}', [EducationController::class, 'show'])
-        ->name('education.show');
+    Route::get('/education/{slug}', [
+        EducationController::class,
+        'show'
+    ])->name('education.show');
 
 
     /*
@@ -144,18 +298,22 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/chatbot', [ChatbotController::class, 'index'])
-        ->name('chatbot');
+    Route::get('/chatbot', [
+        ChatbotController::class,
+        'index'
+    ])->name('chatbot');
 
 
     /*
     |--------------------------------------------------------------------------
-    | Bank Sampah
+    | Bank Sampah untuk User
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/bank-sampah', [BankSampahController::class, 'index'])
-        ->name('bank-sampah');
+    Route::get('/bank-sampah', [
+        BankSampahController::class,
+        'index'
+    ])->name('bank-sampah');
 
 
     /*
@@ -163,6 +321,7 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     | Marketplace
     |--------------------------------------------------------------------------
     */
+
 
     Route::get('/marketplace', [MarketplaceController::class, 'index'])
         ->name('marketplace');
@@ -177,6 +336,44 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     Route::post('/marketplace/pesanan/{order}/pembayaran', [MarketplaceController::class, 'uploadPaymentProof'])
         ->name('marketplace.payment.upload');
 
+    Route::get('/marketplace', [
+        MarketplaceController::class,
+        'index'
+    ])->name('marketplace');
+
+    Route::get(
+        '/marketplace/produk/{product}',
+        [
+            MarketplaceController::class,
+            'show'
+        ]
+    )->name('marketplace.product');
+
+    Route::post(
+        '/marketplace/produk/{product}/beli',
+        [
+            MarketplaceController::class,
+            'buy'
+        ]
+    )->name('marketplace.product.buy');
+
+    Route::get(
+        '/marketplace/pesanan/{order}/pembayaran',
+        [
+            MarketplaceController::class,
+            'payment'
+        ]
+    )->name('marketplace.payment');
+
+    Route::post(
+        '/marketplace/pesanan/{order}/pembayaran',
+        [
+            MarketplaceController::class,
+            'uploadPaymentProof'
+        ]
+    )->name('marketplace.payment.upload');
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -184,8 +381,10 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::view('/analytics', 'dashboard.analytics')
-        ->name('analytics');
+    Route::view(
+        '/analytics',
+        'dashboard.analytics'
+    )->name('analytics');
 
 
     /*
@@ -194,7 +393,9 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/profile', [ProfileController::class, 'index'])
-        ->name('profile');
+    Route::get('/profile', [
+        ProfileController::class,
+        'index'
+    ])->name('profile');
 
 });
