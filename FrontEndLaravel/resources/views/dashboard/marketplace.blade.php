@@ -16,7 +16,7 @@
         </div>
 
         <!-- Filter & Search -->
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
             <div class="relative hidden sm:block">
                 <input 
                     type="text" 
@@ -28,6 +28,21 @@
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
             </div>
+
+            <a
+                href="{{ route('marketplace.orders') }}"
+                class="inline-flex items-center justify-center gap-2 rounded-[12px] border border-lime-200 bg-lime-50 px-4 py-2.5 text-sm font-bold text-lime-800 transition hover:bg-lime-100"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 6h13"></path>
+                    <path d="M8 12h13"></path>
+                    <path d="M8 18h13"></path>
+                    <path d="M3 6h.01"></path>
+                    <path d="M3 12h.01"></path>
+                    <path d="M3 18h.01"></path>
+                </svg>
+                Pesanan Saya
+            </a>
 
             <select class="px-4 py-2.5 rounded-[12px] border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-lime-400 bg-white">
                 <option value="">Semua Kategori</option>

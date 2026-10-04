@@ -36,6 +36,8 @@ Catatan:
 
 - Jika Anda ingin menghubungkan frontend dengan backend FastAPI, atur URL API di konfigurasi atau environment sesuai alamat server FastAPI.
 - File frontend ini terintegrasi dengan model dan router FastAPI yang ada di folder `FastAPI`.
+- Untuk mengirim email reset password, konfigurasi `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, dan `MAIL_FROM_NAME` pada environment deployment. Gunakan SMTP/mail provider yang valid; tanpa konfigurasi email, tautan reset tidak akan sampai ke pengguna.
+- Pada `APP_ENV=local` yang diakses melalui `localhost` atau loopback, form lupa password dapat langsung membuka form password baru tanpa mengirim email. Fitur ini sengaja tidak tersedia di lingkungan selain lokal.
 
 Kontak dan kontribusi:
 

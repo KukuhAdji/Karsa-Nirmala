@@ -30,9 +30,17 @@
         @if ($product->stock > 0)
             <section id="buy" class="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-8">
                 <h2 class="text-xl font-black text-slate-900">Beli Produk</h2>
-                <p class="mt-1 text-sm text-slate-500">Isi data berikut. Bank sampah akan menghubungi Anda untuk konfirmasi pesanan.</p>
-                <form method="POST" action="{{ route('marketplace.product.buy', $product) }}" class="mt-5 grid gap-4 md:grid-cols-2">
+                <p class="mt-1 text-sm text-slate-500">Transfer melalui QRIS, isi data penerima, lalu unggah bukti pembayaran untuk mengirim pesanan.</p>
+                <form method="POST" action="{{ route('marketplace.product.buy', $product) }}" enctype="multipart/form-data" class="mt-5 grid gap-4 md:grid-cols-2">
                     @csrf
+                    <div class="rounded-2xl border border-lime-200 bg-lime-50 p-5 text-center md:col-span-2">
+                        <h3 class="font-black text-slate-900">QRIS {{ $product->bankSampah->name }}</h3>
+                        @if ($product->bankSampah->qris_image)
+                            <img src="{{ asset('storage/' . $product->bankSampah->qris_image) }}" alt="QRIS {{ $product->bankSampah->name }}" class="mx-auto mt-4 max-h-72 rounded-xl bg-white p-2 object-contain">
+                        @else
+                            <p class="mt-3 rounded-xl bg-white px-4 py-6 text-sm text-slate-600">QRIS belum tersedia. Silakan hubungi bank sampah sebelum melanjutkan pembelian.</p>
+                        @endif
+                    </div>
                     <div>
                         <label class="text-sm font-bold text-slate-700">Nama penerima</label>
                         <input name="customer_name" required value="{{ old('customer_name', auth()->user()->name) }}" class="mt-2 w-full rounded-2xl border-slate-200 px-4 py-3 text-sm">
@@ -49,10 +57,15 @@
                         <label class="text-sm font-bold text-slate-700">Alamat pengiriman</label>
                         <textarea name="shipping_address" rows="3" required class="mt-2 w-full rounded-2xl border-slate-200 px-4 py-3 text-sm">{{ old('shipping_address') }}</textarea>
                     </div>
+                    <div class="md:col-span-2">
+                        <label for="payment_proof" class="text-sm font-bold text-slate-700">Bukti pembayaran <span class="text-red-600">*</span></label>
+                        <input id="payment_proof" name="payment_proof" type="file" required accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:font-bold file:text-emerald-700">
+                        <p class="mt-1 text-xs text-slate-500">Wajib diunggah sebelum pesanan dapat dikirim. JPG, PNG, atau WebP, maksimal 5 MB.</p>
+                    </div>
                     @if ($errors->any())
                         <div class="md:col-span-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>
                     @endif
-                    <button class="md:col-span-2 rounded-2xl bg-gradient-to-r from-lime-500 to-green-600 px-5 py-3 text-sm font-bold text-white hover:shadow-lg">Buat Pesanan</button>
+                    <button class="md:col-span-2 rounded-2xl bg-gradient-to-r from-lime-500 to-green-600 px-5 py-3 text-sm font-bold text-white hover:shadow-lg">Kirim Pesanan &amp; Bukti Pembayaran</button>
                 </form>
             </section>
         @endif

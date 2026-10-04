@@ -35,7 +35,7 @@ body{
 <div
 x-data="{
 register: {{ request()->route()->getName() === 'register' || old('email') && $errors->any() ? 'true' : 'false' }},
-forgot:false
+forgot: {{ session()->has('resetStatus') || $errors->getBag('forgotPassword')->any() ? 'true' : 'false' }}
 }"
 x-cloak
 class="min-h-screen bg-gradient-to-br from-lime-50 via-white to-green-100">
@@ -349,18 +349,44 @@ class="bg-white rounded-[32px] p-8 w-full max-w-md">
 Reset Password
 </h3>
 
-<form>
+<form
+method="POST"
+action="{{ route('password.email') }}"
+x-data="{ submitting: false }"
+@submit="submitting = true">
+
+@csrf
+
+@if (session('resetStatus'))
+<p class="mb-4 bg-green-100 border border-green-300 text-green-700 p-3 rounded-xl" role="status">
+    {{ session('resetStatus') }}
+</p>
+@endif
+
+@if ($errors->getBag('forgotPassword')->any())
+<div class="mb-4 bg-red-100 border border-red-300 text-red-700 p-3 rounded-xl" role="alert">
+    @foreach ($errors->getBag('forgotPassword')->all() as $error)
+        <p>{{ $error }}</p>
+    @endforeach
+</div>
+@endif
 
 <input
 type="email"
+name="email"
+value="{{ old('email') }}"
+required
+autocomplete="email"
 placeholder="Email Address"
 class="w-full border rounded-xl p-4">
 
 <button
-type="button"
-class="w-full mt-4 bg-lime-500 text-white py-4 rounded-xl font-bold">
+type="submit"
+:disabled="submitting"
+class="w-full mt-4 bg-lime-500 hover:bg-lime-600 disabled:bg-slate-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold transition">
 
-Send Reset Link
+<span x-show="!submitting">{{ app()->environment('local') && in_array(strtolower(request()->getHost()), ['localhost', '127.0.0.1', '::1'], true) ? 'Continue to Reset Password' : 'Send Reset Link' }}</span>
+<span x-show="submitting">Sending...</span>
 
 </button>
 

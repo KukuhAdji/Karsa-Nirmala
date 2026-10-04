@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Throwable;
 
 class MarketplaceController extends Controller
 {
@@ -39,6 +40,16 @@ class MarketplaceController extends Controller
         return view('dashboard.marketplace', ['products' => $catalogProducts]);
     }
 
+    public function orders(Request $request): View
+    {
+        $orders = MarketplaceOrder::with(['product.bankSampah'])
+            ->where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
+
+        return view('dashboard.marketplace-orders', compact('orders'));
+    }
+
     public function show(MarketplaceProduct $product): View
     {
         abort_unless($product->status === 'Tersedia', 404);
@@ -53,33 +64,44 @@ class MarketplaceController extends Controller
             'customer_phone' => ['required', 'string', 'min:8', 'max:30'],
             'shipping_address' => ['required', 'string', 'min:10', 'max:2000'],
             'quantity' => ['required', 'integer', 'min:1'],
+            'payment_proof' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        $order = DB::transaction(function () use ($product, $validated, $request): MarketplaceOrder {
-            $lockedProduct = MarketplaceProduct::whereKey($product->id)->lockForUpdate()->firstOrFail();
+        $proof = $request->file('payment_proof')->store('payment-proofs', 'public');
 
-            if ($lockedProduct->status !== 'Tersedia' || $validated['quantity'] > $lockedProduct->stock) {
-                abort(422, 'Stok produk tidak mencukupi.');
-            }
+        try {
+            $order = DB::transaction(function () use ($product, $validated, $request, $proof): MarketplaceOrder {
+                $lockedProduct = MarketplaceProduct::whereKey($product->id)->lockForUpdate()->firstOrFail();
 
-            $order = MarketplaceOrder::create([
-                'user_id' => $request->user()->id,
-                'marketplace_product_id' => $lockedProduct->id,
-                'customer_name' => $validated['customer_name'],
-                'customer_phone' => $validated['customer_phone'],
-                'shipping_address' => $validated['shipping_address'],
-                'quantity' => $validated['quantity'],
-                'unit_price' => $lockedProduct->price,
-                'total_price' => $lockedProduct->price * $validated['quantity'],
-                'status' => 'Menunggu pembayaran',
-            ]);
+                if ($lockedProduct->status !== 'Tersedia' || $validated['quantity'] > $lockedProduct->stock) {
+                    abort(422, 'Stok produk tidak mencukupi.');
+                }
 
-            $lockedProduct->decrement('stock', $validated['quantity']);
+                $order = MarketplaceOrder::create([
+                    'user_id' => $request->user()->id,
+                    'marketplace_product_id' => $lockedProduct->id,
+                    'customer_name' => $validated['customer_name'],
+                    'customer_phone' => $validated['customer_phone'],
+                    'shipping_address' => $validated['shipping_address'],
+                    'quantity' => $validated['quantity'],
+                    'unit_price' => $lockedProduct->price,
+                    'total_price' => $lockedProduct->price * $validated['quantity'],
+                    'payment_proof' => $proof,
+                    'status' => 'Menunggu verifikasi pembayaran',
+                ]);
 
-            return $order;
-        });
+                $lockedProduct->decrement('stock', $validated['quantity']);
 
-        return redirect()->route('marketplace.payment', $order);
+                return $order;
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($proof);
+
+            throw $exception;
+        }
+
+        return redirect()->route('marketplace.payment', $order)
+            ->with('success', 'Bukti pembayaran berhasil dikirim ke bank sampah.');
     }
 
     public function payment(Request $request, MarketplaceOrder $order): View

@@ -45,6 +45,21 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])
         ->name('register.post');
 
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])
+        ->name('password.email');
+
+    Route::get('/local-reset-password', [AuthController::class, 'showLocalResetForm'])
+        ->name('password.local-reset.form');
+
+    Route::post('/local-reset-password', [AuthController::class, 'resetLocalPassword'])
+        ->name('password.local-reset.update');
+
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+        ->name('password.update');
+
 });
 
 
@@ -151,6 +166,8 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
 
     Route::get('/marketplace', [MarketplaceController::class, 'index'])
         ->name('marketplace');
+    Route::get('/marketplace/pesanan-saya', [MarketplaceController::class, 'orders'])
+        ->name('marketplace.orders');
     Route::get('/marketplace/produk/{product}', [MarketplaceController::class, 'show'])
         ->name('marketplace.product');
     Route::post('/marketplace/produk/{product}/beli', [MarketplaceController::class, 'buy'])
