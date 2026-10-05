@@ -52,4 +52,12 @@ class ScannerController extends Controller
             compact('histories')
         );
     }
+
+    public function historyDetail(Classification $classification)
+    {
+        $classification = Classification::where('user_id', auth()->id())
+            ->findOrFail($classification->id);
+
+        return view('dashboard.history-detail', compact('classification'));
+    }
 }

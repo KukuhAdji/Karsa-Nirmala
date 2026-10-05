@@ -61,11 +61,11 @@
                         </p>
 
                         {{-- View Button --}}
-                        <button 
-                            type="button"
-                            class="mt-2 w-full rounded-[12px] bg-lime-50 py-2 text-xs font-bold text-lime-700 transition hover:bg-lime-100 border border-lime-200/50">
+                        <a
+                            href="{{ route('scanner.history.detail', $history) }}"
+                            class="mt-2 flex w-full justify-center rounded-[12px] bg-lime-50 py-2 text-xs font-bold text-lime-700 transition hover:bg-lime-100 border border-lime-200/50">
                             Lihat Detail
-                        </button>
+                        </a>
 
                     </div>
 

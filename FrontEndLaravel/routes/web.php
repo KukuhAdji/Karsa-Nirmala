@@ -24,6 +24,9 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+Route::view('/how-it-works', 'how-it-works')
+    ->name('how-it-works');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +127,9 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
     Route::get('/scanner/history', [ScannerController::class, 'history'])
         ->name('scanner.history');
 
+    Route::get('/scanner/history/{classification}', [ScannerController::class, 'historyDetail'])
+        ->name('scanner.history.detail');
+
 
     /*
     |--------------------------------------------------------------------------
@@ -196,5 +202,7 @@ Route::middleware(['auth', 'bank-sampah-admin.access'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'index'])
         ->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
 });

@@ -65,33 +65,6 @@
         <!-- RIGHT SIDE -->
         <div class="flex items-center gap-2 sm:gap-4 shrink-0">
 
-            <!-- Notification -->
-            <button
-                class="relative p-2 sm:p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 transition">
-
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 sm:w-5 sm:h-5 text-slate-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0m6 0H9"
-                    />
-
-                </svg>
-
-                <span
-                    class="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full border-2 border-white">
-                </span>
-
-            </button>
-
-
             <!-- User Profile -->
             <a href="{{ route('profile') }}"
                 class="hidden sm:flex items-center gap-2 sm:gap-3 rounded-full border border-slate-200 bg-slate-50/80 px-2 sm:px-3 py-2 shadow-sm transition hover:border-lime-300 hover:bg-lime-50"

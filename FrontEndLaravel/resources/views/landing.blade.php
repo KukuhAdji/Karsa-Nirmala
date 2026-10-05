@@ -39,14 +39,9 @@
                     Tentang Karsa
                 </a>
 
-                <a href="#how"
+                <a href="{{ route('how-it-works') }}"
                    class="group relative rounded-full px-5 py-2 text-sm font-semibold text-slate-600 transition duration-200 hover:bg-white hover:text-lime-700 hover:shadow-sm">
                     How It Works
-                </a>
-
-                <a href="#education"
-                   class="group relative rounded-full px-5 py-2 text-sm font-semibold text-slate-600 transition duration-200 hover:bg-white hover:text-lime-700 hover:shadow-sm">
-                    Education
                 </a>
             </div>
 
@@ -112,7 +107,7 @@
                     </svg>
                 </a>
 
-                <a href="#how"
+                <a href="{{ route('how-it-works') }}"
                    class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-lime-50 hover:text-lime-700">
                     <span>How It Works</span>
 
@@ -126,19 +121,6 @@
                     </svg>
                 </a>
 
-                <a href="#education"
-                   class="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-lime-50 hover:text-lime-700">
-                    <span>Education</span>
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2"
-                         class="w-4 h-4">
-                        <path d="m9 18 6-6-6-6"></path>
-                    </svg>
-                </a>
             </div>
 
             <div class="mt-5 grid grid-cols-1 gap-3 border-t border-slate-200 pt-5">
